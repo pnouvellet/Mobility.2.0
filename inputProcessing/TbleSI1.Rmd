@@ -1,0 +1,145 @@
+---
+title: "input"
+author: "Pierre Nouvellet"
+date: "2019-07"
+---
+
+```{r , include = FALSE, message = FALSE, warning = FALSE, error = FALSE}
+library(rmarkdown)
+
+```
+
+# input data
+
+```{r}
+source(file = 'date_input.r')
+path_s <- '../../Mobility.2.0.Save/Saved_file/'
+
+```
+## run template
+
+```{r}
+
+for (date_num in length(dates_input)){
+ 
+    
+    date_week_finishing <-  as.Date(dates_input[date_num],format = '%Y-%m-%d')
+    input <- readRDS(file=paste0(path_s,'inputProcessing/Rdata/',date_week_finishing,'_inputs_from_A.rds'))
+
+   
+}
+
+### read mobility
+d_m <- read.csv(file=paste0(path_s,'inputs/applemobilitytrends-2020-05-16.csv'),
+                stringsAsFactors = FALSE)
+# d_m needs 3 colums for "geo_type"            "region"              "transportation_type" 
+# +one column per dates names as 'X.2020.01.20'
+
+
+#miss-spelled
+# country[-which(as.character(country) %in% as.character(d_m$region))]
+
+# missing for apple: Algeria, China, Dominican_Republic, Ecuador, Iran, Peru, South_Korea, 
+#corrections to match name in ECDC data
+d_m$region[which(d_m$region %in% 'Czech Republic')] <- 'Czechia'
+d_m$region[which(d_m$region %in% 'UK')] <- 'United_Kingdom'
+d_m$region[which(d_m$region %in% 'United States')] <- 'United_States_of_America'
+d_m$region[which(d_m$region %in% 'Saudi Arabia')] <- 'Saudi_Arabia'
+d_m$region[which(d_m$region %in% 'Republic of Korea')] <- 'South_Korea'
+```
+
+```{r}
+
+country <- names(input$D)[-1]
+country2 <- country
+
+country2[which(country2 %in% 'United_Kingdom')] <- 'UK'
+country2[which(country2 %in% 'United_States_of_America')] <- 'USA'
+country2[which(country2 %in% 'South_Korea')] <- 'South Korea'
+country2[which(country2 %in% 'Saudi_Arabia')] <- 'Saudi Arabia'
+country2[which(country2 %in% 'Dominican_Republic')] <- 'Dominican Rep.'
+
+tab1 <- data.frame(country = country2,
+                   death = colSums(input$D[,-1]),
+                   mobility = rep(NA,length(country)),
+                   mobilityXources = rep(NA,length(country) ))
+
+for (i in 1:length(country)){
+  tab1$mobility[i] <- round(min(input$M[,i])*100,digits = 0)
+  tab1$mobilityXources[i] <- min(input$M[,i])
+  f <- which(d_m$region %in% country[i])
+  tab1$mobilityXources[i] <- length(f)
+}
+# write.csv(tab1,file='output/table1.csv')
+```
+
+# same for google
+
+```{r}
+
+for (date_num in length(dates_input)){
+ 
+    
+    date_week_finishing <-  as.Date(dates_input[date_num],format = '%Y-%m-%d')
+    input <- readRDS(file=paste0(path_s,'inputProcessing/Rdata/',date_week_finishing,'_inputs_from_G.rds'))
+
+   
+}
+
+### read mobility
+# d_m <- read.csv(file='../inputs/applemobilitytrends-2020-04-26.csv',stringsAsFactors = FALSE)
+d_m <- read.csv(file=paste0(path_s,'inputs/google.csv'),
+                stringsAsFactors = FALSE)
+# d_m needs 3 colums for "geo_type"            "region"              "transportation_type" 
+# +one column per dates names as 'X.2020.01.20'
+
+# 
+# #miss-spelled
+# country[-which(as.character(country) %in% as.character(d_m$region))]
+
+# missing for apple: Algeria, China, Dominican_Republic, Ecuador, Iran, Peru, South_Korea, 
+#corrections to match name in ECDC data
+d_m$region[which(d_m$region %in% 'United Kingdom')] <- 'United_Kingdom'
+d_m$region[which(d_m$region %in% 'United States')] <- 'United_States_of_America'
+d_m$region[which(d_m$region %in% 'South Korea')] <- 'South_Korea'
+d_m$region[which(d_m$region %in% 'Saudi Arabia')] <- 'Saudi_Arabia'
+d_m$region[which(d_m$region %in% 'Dominican Republic')] <- 'Dominican_Republic'
+
+```
+
+```{r}
+
+country <- names(input$D)[-1]
+country2 <- country
+
+country2[which(country2 %in% 'United_Kingdom')] <- 'UK'
+country2[which(country2 %in% 'United_States_of_America')] <- 'USA'
+country2[which(country2 %in% 'South_Korea')] <- 'South Korea'
+country2[which(country2 %in% 'Saudi_Arabia')] <- 'Saudi Arabia'
+country2[which(country2 %in% 'Dominican_Republic')] <- 'Dominican Rep.'
+
+tab2 <- data.frame(country = country2,
+                   death = colSums(input$D[,-1]),
+                   mobility = rep(NA,length(country)),
+                   mobilityXources = rep(NA,length(country) ))
+
+for (i in 1:length(country)){
+  tab2$mobility[i] <- round(min(input$M[,i])*100,digits = 0)
+  tab2$mobilityXources[i] <- min(input$M[,i])
+  f <- which(d_m$region %in% country[i])
+  tab2$mobilityXources[i] <- length(f)
+}
+# write.csv(tab1,file='output/table1.csv')
+```
+
+
+# combine table
+
+```{r}
+tab <- merge(x = tab1, y = tab2, by = 'country', all = TRUE)
+tab$death.x[which(is.na(tab$death.x))] <- tab$death.y[which(is.na(tab$death.x))]
+tab <- tab[order(as.character(tab$country)),c(1:3,6,4,7)]
+write.csv(tab,file=paste0(path_s,'inputProcessing/Rdata/table1.csv'))
+
+```
+

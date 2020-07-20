@@ -1,0 +1,128 @@
+---
+title: "R0Beta"
+author: "Pierre Nouvellet"
+date: "2019-07"
+---
+
+```{r , include = FALSE, message = FALSE, warning = FALSE, error = FALSE}
+library(knitr)
+library(Hmisc)
+library(EpiEstim)
+library(zoo)
+library(latex2exp)
+
+opts_chunk$set(collapse = TRUE)
+
+opts_chunk$set(fig.path='../../Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/figs/', fig.keep='high', 
+               dev=c('png'), fig.width=9, fig.height=6, cache=FALSE,
+               tidy=FALSE, warning=FALSE, fig.show="asis"
+)
+
+```
+
+# input data
+
+
+```{r}
+
+
+source(file = '../inputProcessing/date_input.r')
+
+output_var_T1 <- c('country','change','oldR0','newR0',
+                   'oldBeta','newBeta','oldTh','newTh','t_change','DIC')
+
+
+for (date_num in 1:length(dates_input)){
+  # date_num = 1
+  
+  date_week_finishing <-  as.Date(dates_input[date_num],format = '%Y-%m-%d')
+  
+  
+  for (Mdata in c('A','G')){
+    # Mdata = 'A'
+    
+    
+    
+    R1 <-  readRDS( file = paste0('../../Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/',
+                                  date_week_finishing,'_output_over_form_',Mdata,'.rds' ) )
+    
+    R2 <-  readRDS( file = paste0('../../Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/',
+                                  date_week_finishing,'_output_over_form_',Mdata,'.rds' ) )
+    
+    for (si in 2){
+      # si=2
+      
+      res1 <- R1[[si]]
+      res2 <- R2[[si]]
+      
+      # table 1
+      n_country <- ncol(res1$R0s)
+      country_names <- names(res1$resMCMC$DIC)[1:n_country]
+      Tb1 <- data.frame(matrix(NA,n_country*2,length(output_var_T1)))
+      names(Tb1) <- output_var_T1
+      
+      Tb1[1:n_country,] <- cbind(country_names,'no',NA,
+                                 paste0(round(res1$R0s[1,],digits = 1),
+                                        ' ; 95%CrI[',round(res1$R0s[2,],digits = 1),
+                                        ';',round(res1$R0s[3,],digits = 1),']'),
+                                 NA,
+                                 paste0(round(res1$R0s[1,],digits = 1),
+                                        ' ; 95%CrI[',round(res1$R0s[2,],digits = 1),
+                                        ';',round(res1$R0s[3,],digits = 1),']'),
+                                 NA,
+                                 paste0(round(res1$Thresholds[1,],digits = 1),
+                                        ' ; 95%CrI[',round(res1$Thresholds[2,],digits = 1),
+                                        ';',round(res1$Thresholds[3,],digits = 1),']'),
+                                 NA,
+                                 round(res1$resMCMC$DIC[1:n_country]))
+      
+      Tb1[n_country+(1:n_country),] <- cbind(country_names,'yes',
+                                             paste0(round(res2$R0s[1,],digits = 1),
+                                                    ' ; 95%CrI[',round(res2$R0s[2,],digits = 1),
+                                                    ';',round(res2$R0s[3,],digits = 1),']'),
+                                             paste0(round(res2$R0s2[1,],digits = 1),
+                                                    ' ; 95%CrI[',round(res2$R0s2[2,],digits = 1),
+                                                    ';',round(res2$R0s2[3,],digits = 1),']'),
+                                             paste0(round(res2$betas[1,],digits = 1),
+                                                    ' ; 95%CrI[',round(res2$betas[2,],digits = 1),
+                                                    ';',round(res2$betas[3,],digits = 1),']'),
+                                             paste0(round(res2$betas2[1,],digits = 1),
+                                                    ' ; 95%CrI[',round(res2$betas2[2,],digits = 1),
+                                                    ';',round(res2$betas2[3,],digits = 1),']'),
+                                             paste0(round(res2$Thresholds[1,],digits = 1),
+                                                    ' ; 95%CrI[',round(res2$Thresholds[2,],digits = 1),
+                                                    ';',round(res2$Thresholds[3,],digits = 1),']'),
+                                             paste0(round(res2$Thresholds2[1,],digits = 1),
+                                                    ' ; 95%CrI[',round(res2$Thresholds2[2,],digits = 1),
+                                                    ';',round(res2$Thresholds2[3,],digits = 1),']'),
+                                             paste0(round(res2$tchange[1,],digits = 1),
+                                                    ' ; 95%CrI[',round(res2$tchange[2,],digits = 1),
+                                                    ';',round(res2$tchange[3,],digits = 1),']'),
+                                             round(res2$resMCMC$DIC[1:n_country]))
+      
+      Tb_best <- data.frame(matrix(NA,n_country,length(output_var_T1)))
+      names(Tb_best) <- output_var_T1
+      for (i in 1:n_country){
+        if(res1$resMCMC$DIC[i] < (5+res2$resMCMC$DIC[i])){
+          Tb_best[i,] <- Tb1[i,]
+        }else{
+          Tb_best[i,] <- Tb1[n_country+i,]
+        }
+      }
+      output <- list(Tb1 = Tb1, Tb_best = Tb_best)
+    }
+    
+    write.csv(output$Tb1,
+              file = paste0('../../Mobility.2.0.Save/Saved_file/TableModels_comparision/RData/',
+                          date_week_finishing,'_Tb1_over_form_',Mdata,'.csv' ))
+    write.csv(output$Tb_best,
+              file = paste0('../../Mobility.2.0.Save/Saved_file/TableModels_comparision/RData/',
+                          date_week_finishing,'_Tb_best_over_form_',Mdata,'.csv' ))
+    
+    saveRDS(object = output,
+            file = paste0('../../Mobility.2.0.Save/Saved_file/TableModels_comparision/RData/',
+                          date_week_finishing,'_output_over_form_',Mdata,'.rds' ))
+  }
+}
+
+```
