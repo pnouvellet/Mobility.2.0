@@ -47,14 +47,14 @@ for (Mdata in c('A','G')){
   # Mdata = 'A'
   
   inputs<- readRDS(file=paste0(
-    '../../Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/',
+    '../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/',
     date_week_finishing,'_inputs_from_',Mdata,'.rds'))
   
   res_base <- readRDS(file=paste0(
-    '../../Mobility.2.0.Save/Saved_file/EpiEstim/Rdata/',
+    '../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/EpiEstim/Rdata/',
     date_week_finishing,'_output_from_',Mdata,'.rds'))
   
-  Tb_best <- readRDS(file = paste0('../../Mobility.2.0.Save/Saved_file/TableModels_comparision/RData/',
+  Tb_best <- readRDS(file = paste0('../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/TableModels_comparision/RData/',
                                    date_week_finishing,'_output_over_form_',Mdata,'.rds' ))$Tb_best
   
   n_country <- nrow(Tb_best)
@@ -64,13 +64,13 @@ for (Mdata in c('A','G')){
     # i=1
     if (Tb_best$change[i] == 'no'){
       Change <- 0
-      res_summary <-  readRDS( file = paste0('../../Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/',
+      res_summary <-  readRDS( file = paste0('../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/',
                                              date_week_finishing,'_output2_over_form_',Mdata,'.rds' ) )[[si]]
       
       
     }else{
       Change <- 1
-      res_summary <-  readRDS( file = paste0('../../Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/',
+      res_summary <-  readRDS( file = paste0('../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/',
                                              date_week_finishing,'_output2_over_form_',Mdata,'.rds' ) )[[si]]
     }
     
