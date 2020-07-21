@@ -32,7 +32,7 @@ opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0
 source(file = '../inputProcessing/date_input.r')
 
 
-rep <- 1e2
+rep <- 1e4
 # rep_sim <- 1e4
 
 

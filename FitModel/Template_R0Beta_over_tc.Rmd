@@ -2,6 +2,9 @@
 title: "R0Beta"
 author: "Pierre Nouvellet"
 date: "2019-07"
+output:
+  html_document:
+    self_contained: no
 ---
 
 ```{r , include = FALSE, message = FALSE, warning = FALSE, error = FALSE}
@@ -13,7 +16,7 @@ library(latex2exp)
 
 opts_chunk$set(collapse = TRUE)
 
-opts_chunk$set(fig.path='../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/figs/', fig.keep='high', 
+opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/figs/', fig.keep='high', 
                dev=c('png'), fig.width=9, fig.height=6, cache=FALSE,
                tidy=FALSE, warning=FALSE, fig.show="asis"
  	       )
@@ -42,7 +45,7 @@ for (date_num in 1:length(dates_input)){
     # Mdata = 'A'
     
     inputs<- readRDS(file=paste0(
-      '../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/',
+      '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/',
       date_week_finishing,'_inputs_from_',Mdata,'.rds'))
     
     for (si in 1:2){
@@ -392,11 +395,11 @@ for (date_num in 1:length(dates_input)){
     }
     
     saveRDS(object = output,
-            file = paste0('../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/',
+            file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/',
                           date_week_finishing,'_output_over_form_',Mdata,'.rds' ))
     
     saveRDS(object = output2,
-            file = paste0('../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/',
+            file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/',
                           date_week_finishing,'_output2_over_form_',Mdata,'.rds' ))
   }
 }
