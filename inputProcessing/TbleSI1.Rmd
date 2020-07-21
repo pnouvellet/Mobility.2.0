@@ -13,7 +13,7 @@ library(rmarkdown)
 
 ```{r}
 source(file = 'date_input.r')
-path_s <- '../../Mobility.2.0.Save/Saved_file/'
+path_s <- '../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/'
 
 ```
 ## run template
