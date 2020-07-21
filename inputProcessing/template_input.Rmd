@@ -13,7 +13,7 @@ library(latex2exp)
 
 opts_chunk$set(collapse = TRUE)
 
-path_s <- '../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/'
+path_s <- '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/'
 
 opts_chunk$set(fig.path=paste0(path_s,'inputProcessing/figs/'), fig.keep='high', 
                dev=c('png'), fig.width=9, fig.height=6, cache=FALSE,

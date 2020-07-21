@@ -13,7 +13,7 @@ library(rmarkdown)
 
 ```{r}
 source(file = 'date_input.r')
-path_s <- '../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/'
+path_s <- '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/'
 
 ```
 ## run template
@@ -33,7 +33,7 @@ for (date_num in 1:length(dates_input)){
     date_week_finishing <-  as.Date(dates_input[date_num],format = '%Y-%m-%d')
     
     rmarkdown::render(input = 'template_input.Rmd',
-                      output_file = paste0('../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/inputProcessing/input_',
+                      output_file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/input_',
                                            date_week_finishing,'_from_',D_source,'.html'))
   }
 }
