@@ -13,6 +13,7 @@ library(rmarkdown)
 
 ```{r}
 source(file = 'date_input.r')
+
 path_s <- '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.SaveSaved_file/'
 
 ```
