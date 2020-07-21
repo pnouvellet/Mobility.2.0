@@ -2,6 +2,9 @@
 title: "input"
 author: "Pierre Nouvellet"
 date: "2019-07"
+output:
+  html_document:
+    self_contained: no
 ---
 
 ```{r , include = FALSE, message = FALSE, warning = FALSE, error = FALSE}
@@ -14,7 +17,7 @@ library(rmarkdown)
 ```{r}
 source(file = 'date_input.r')
 
-path_s <- '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.SaveSaved_file/'
+path_s <- '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/'
 
 ```
 ## run template

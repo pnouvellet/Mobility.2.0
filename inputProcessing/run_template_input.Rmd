@@ -2,11 +2,14 @@
 title: "input"
 author: "Pierre Nouvellet"
 date: "2019-07"
+output:
+  html_document:
+    self_contained: no
 ---
 
 ```{r , include = FALSE, message = FALSE, warning = FALSE, error = FALSE}
 library(rmarkdown)
-
+knitr::opts_knit$set(self.contained = FALSE)
 ```
 
 # input data
