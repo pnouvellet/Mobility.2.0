@@ -34,22 +34,22 @@ source(file = '../inputProcessing/date_input.r')
 rep <- 1e4
 rep_sim <- 1e3
 
-# for (date_num in 1:length(dates_input)){
-  date_num = length(dates_input)-1
+for (date_num in 1:length(dates_input)){
+  # date_num = length(dates_input)-1
   
   date_week_finishing <-  as.Date(dates_input[date_num],format = '%Y-%m-%d')
   output <- list()  
   output2 <- list()
   
-  # for (Mdata in c('A','G')){
-    Mdata = 'G'
+  for (Mdata in c('A','G')){
+    # Mdata = 'G'
     
     inputs<- readRDS(file=paste0(
       '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/',
       date_week_finishing,'_inputs_from_',Mdata,'.rds'))
     
-    # for (si in 1:2){
-      si=2
+    for (si in 1:2){
+      # si=2
       
       ########################################
       ####inputs
