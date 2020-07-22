@@ -34,22 +34,22 @@ source(file = '../inputProcessing/date_input.r')
 rep <- 1e4
 rep_sim <- 1e3
 
-for (date_num in 1:length(dates_input)){
-  # date_num = 1
+# for (date_num in 1:length(dates_input)){
+  date_num = length(dates_input)-1
   
   date_week_finishing <-  as.Date(dates_input[date_num],format = '%Y-%m-%d')
   output <- list()  
   output2 <- list()
   
-  for (Mdata in c('A','G')){
-    # Mdata = 'A'
+  # for (Mdata in c('A','G')){
+    Mdata = 'G'
     
     inputs<- readRDS(file=paste0(
       '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/',
       date_week_finishing,'_inputs_from_',Mdata,'.rds'))
     
-    for (si in 1:2){
-      # si=1
+    # for (si in 1:2){
+      si=2
       
       ########################################
       ####inputs
@@ -119,7 +119,16 @@ for (date_num in 1:length(dates_input)){
       
       
       Acc <- colSums(diff(res$theta)!=0)/(rep-1)
-      if(rep >1e2) f <- round(seq(1,rep,length.out = 1e2))
+      
+      # thining
+      if(rep >1e3){
+        f <- round(seq(1,rep,length.out = 1e3))
+        res$theta <- res$theta[f,]
+        res$logL <- res$logL[f,]
+      }
+      rep <- nrow(res$theta)
+      
+      # check results
       plot(res$logL[,1],main=paste0('DIC ',res$DIC[1],', P ',res$DIC[2]))
       layout(matrix(1:4,2,2))
       for (i in 1:length(theta0)){
