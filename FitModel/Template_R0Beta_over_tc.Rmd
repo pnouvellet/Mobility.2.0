@@ -133,7 +133,16 @@ for (date_num in 1:length(dates_input)){
       
       
       Acc <- colSums(diff(res$theta)!=0)/(rep-1)
-      if(rep >1e2) f <- round(seq(1,rep,length.out = 1e2))
+      
+      # thining
+      if(rep >1e3){
+        f <- round(seq(1,rep,length.out = 1e3))
+        res$theta <- res$theta[f,]
+        res$logL <- res$logL[f,]
+      }
+      rep <- nrow(res$theta)
+      
+      
       plot(res$logL[,1],main=paste0('DIC ',res$DIC[1],', P ',res$DIC[2]))
       layout(matrix(1:4,2,2))
       for (i in 1:length(theta0)){
