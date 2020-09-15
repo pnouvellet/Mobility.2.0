@@ -34,8 +34,8 @@ source(file = '../inputProcessing/date_input.r')
 rep <- 1e4
 rep_sim <- 1e3
 
-for (date_num in 1:length(dates_input)){
-  # date_num = 2
+for (date_num in length(dates_input)){#1:length(dates_input)){
+  # date_num = length(dates_input)
   
   date_week_finishing <-  as.Date(dates_input[date_num],format = '%Y-%m-%d')
   output <- list()
@@ -75,20 +75,39 @@ for (date_num in 1:length(dates_input)){
       # for risk
       b <- 0
       o <- 1
-      t_change <- which(as.character(D$dates) %in% c('2020-04-15'))
+      
+      min_t_change <- which(as.character(D$dates) %in% c('2020-04-01'))
+      max_t_change <- nrow(D)-7*6
+      t_change <- round((min_t_change+max_t_change)/2)
+      
+      ####################################################
+      ############ improve prior for t_change ############
+      min_t_change <- rep(NA,N_geo)
+      for (i in 1:N_geo){
+        min_t_change[i] <- (which(M[,i] == min(M[,i]))+3*7)[1]
+      }
+      max_t_change <- min_t_change + 4*7
+      f <- which(max_t_change > (nrow(D)-7*4))
+      max_t_change[f] <- nrow(D)-7*4
+      f_remove <- which(min_t_change > max_t_change)
+      max_t_change[f_remove] <- nrow(D)
+     
+      t_change <- round((min_t_change+max_t_change)/2)
+      
+      ####################################################
       
       theta0 <- c(rep(R0,N_geo),
                   rep(b,N_geo),
                   rep(R0,N_geo),
                   rep(b,N_geo),
-                  rep(t_change,N_geo),
+                  t_change,
                   rep(o,N_geo))
       
       prior_theta <- matrix(c(rep(c(0,5),N_geo),
                               rep(c(-1e2,1e2),N_geo),
                               rep(c(0,5),N_geo),
                               rep(c(-1e2,1e2),N_geo),
-                              rep(c(t_change-7*2,nrow(D)-7*2),N_geo), # t_change
+                              c(rbind(min_t_change,max_t_change)), # rep(c(min_t_change,max_t_change),N_geo), # t_change
                               rep(c(0,1e5),N_geo)), # over
                             length(theta0),2, byrow=TRUE)
       
@@ -124,7 +143,7 @@ for (date_num in 1:length(dates_input)){
                        s = sigma, 
                        repli_adapt = 10, 
                        within_iter = rep/10)
-      
+      res$DIC[f_remove] <- NA
       ########################################
       ## check convergence
       

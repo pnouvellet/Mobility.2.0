@@ -1,0 +1,73 @@
+---
+title: "R0Beta"
+author: "Pierre Nouvellet"
+date: "2019-07"
+---
+
+```{r , include = FALSE, message = FALSE, warning = FALSE, error = FALSE}
+library(knitr)
+library(Hmisc)
+library(EpiEstim)
+library(zoo)
+library(latex2exp)
+
+opts_chunk$set(collapse = TRUE)
+
+opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/figs/', fig.keep='high', 
+               dev=c('png'), fig.width=9, fig.height=6, cache=FALSE,
+               tidy=FALSE, warning=FALSE, fig.show="asis"
+)
+
+```
+
+# input data
+
+
+```{r}
+
+
+source(file = '../inputProcessing/date_input.r')
+
+rep <- 1e4
+rep_sim <- 1e3
+
+for (date_num in length(dates_input)){
+  # date_num = length(dates_input)-1
+  
+  date_week_finishing <-  as.Date(dates_input[date_num],format = '%Y-%m-%d')
+  output <- list()  
+  output2 <- list()
+  
+  for (Mdata in c('A','G')){
+    # Mdata = 'G'
+    
+    inputs<- readRDS(file=paste0(
+      '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/',
+      date_week_finishing,'_inputs_from_',Mdata,'.rds'))
+    
+    # for (si in 1:2){
+      si=2
+      
+      ########################################
+      ####inputs
+      D <- inputs$D
+      M <- inputs$M
+      Ot <- inputs$Ot[[si]]$Ot
+      W <- inputs$W[[si]]$W
+      H <- inputs$H
+      SI <- inputs$SI[[si]]$SI
+      delta_id <- inputs$delta_id
+      #
+      country <- names(D)[-1]
+      layout(matrix(1:4,2,2))
+      for (i in 1:length(country)){
+        plot(D$dates,D[,i+1],main = country[i])
+        temp =  c(NA,NA,NA,zoo::rollmean(D[,i+1],k = 7),NA,NA,NA)
+        plot(D$dates,sqrt((temp - D[,i+1])^2),main = country[i])
+        
+      }
+     
+  }
+}
+
+```

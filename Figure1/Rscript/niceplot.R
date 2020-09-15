@@ -1,6 +1,6 @@
 niceplot <- function(i,res_summary, res_base,inputs){
   
-  fig.name=paste0('../../../../Box Sync/save_research/Mobility.2.0.Save/Saved_file/figure1/figs/',date_week_finishing,'/',country[i],'_M_',Mdata,'.png')
+  fig.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/figs/',date_week_finishing,'/',country[i],'_M_',Mdata,'.png')
   png(filename = fig.name, width = 9, height=6, units="in", res = 300)
 
   xlim <- c(as.Date('15-02-2020',format='%d-%m-%Y'),range(inputs$D$dates)[2])
@@ -8,7 +8,7 @@ niceplot <- function(i,res_summary, res_base,inputs){
   # plot mobility
   plot(inputs$mob_raw$dates,inputs$mob_raw[,i+1],#main = country[i],
        xlim = xlim,
-       ylim = c(0,max(c(1,inputs$mob_raw[,i+1]))),
+       ylim = c(0,max(c(1,inputs$mob_raw[,i+1]),na.rm=TRUE)),
        xlab = '',ylab = 'prop. mobility',pch=16,bty = 'n')
   lines(inputs$mob_raw$dates,inputs$M[,i],col='darkorchid3',lwd=2)
   # lines(mob3[,i+1],col='red')
@@ -56,8 +56,19 @@ niceplot <- function(i,res_summary, res_base,inputs){
           c(res_summary$results_full_Rt_daily$low_R[f,i+1],
             rev(res_summary$results_full_Rt_daily$up_R[f,i+1])),
           col=rgb(1,0,0,.2), border = NA)
-  legend('topleft',legend = c(TeX('R_t^{D}'),TeX('R_t'),TeX('R_t^{obs}')), 
-         col = c(rgb(0,0,1),rgb(1,0,0),rgb(0,0,0)),lwd=2,bty='n')
+  
+  if (Change == 1){
+    lines(inputs$D$dates[round(res_m$tchange[1,i])],5.5,type = 'p',pch=16,col='black')
+    lines(inputs$D$dates[round(res_m$tchange[2:3,i])],rep(5.5,2),lwd=1.5)
+  }
+  if (Change ==0){
+    legend('topleft',legend = c(TeX('R_t^{D}'),TeX('R_t'),TeX('R_t^{obs}')), 
+           col = c(rgb(0,0,1),rgb(1,0,0),rgb(0,0,0)),lwd=2,bty='n')
+  }else{
+    legend('topleft',legend = c(TeX('R_t^{D}'),TeX('R_t'),TeX('R_t^{obs}'),TeX('t_{change}')), 
+           col = c(rgb(0,0,1),rgb(1,0,0),rgb(0,0,0),rgb(0,0,0)),lwd=2,
+           pch = c(rep(NA,3),16),bty='n')
+  }
   
   
   
@@ -166,7 +177,7 @@ niceplot <- function(i,res_summary, res_base,inputs){
                                  TeX('past R_t^{obs}')),
            col = c(rgb(.4,.5,.1,.2),rgb(0,0,0)),lwd=2,bty='n')
   }else{
-    f_new <-  n_est-round(as.numeric(substr(Tb_best$t_change[i], 1,2))/7)
+    f_new <-  n_est-round(as.numeric(substr(Tb_best$t_change[i], 1,3))/7)
     errbar(x = x,
            y = y,
            yplus = yplus,
@@ -185,8 +196,12 @@ niceplot <- function(i,res_summary, res_base,inputs){
   }
   
   
-  
-  mtext(paste0(country[i],' (Apple)'), side = 3,  line = 1.5, outer = FALSE,adj = -.15,font=2)
+  if(Mdata == 'A'){
+    mtext(paste0(country[i],' (Apple)'), side = 3,  line = 1.5, outer = FALSE,adj = -.15,font=2)
+  }else{
+    mtext(paste0(country[i],' (Google)'), side = 3,  line = 1.5, outer = FALSE,adj = -.15,font=2)
+    
+  }
   
   dev.off()
   
