@@ -54,6 +54,7 @@ d_g <- d_g[ which(d_g$sub_region_1 == ''),]
 d_g <- d_g[ which(d_g$sub_region_2 == ''),]
 d_g <- d_g[ which(d_g$metro_area == ''),]
 
+names(d_g)
 ##
 
 a <- tidyr::gather(d_g, var,
@@ -64,9 +65,9 @@ b <- tidyr::spread(a, date, val)
 
 
 b <- b[,-which(names(b) %in% c("sub_region_1","sub_region_2" , 'metro_area','iso_3166_2_code','census_fips_code'))]
-b <- b[-which(b$var %in% c('grocery_and_pharmacy_percent_change_from_baseline',
-                               'parks_percent_change_from_baseline',
-                               'residential_percent_change_from_baseline')) , ]
+# b <- b[-which(b$var %in% c('grocery_and_pharmacy_percent_change_from_baseline',
+#                                'parks_percent_change_from_baseline',
+#                                'residential_percent_change_from_baseline')) , ]
 
 names(b)[1:3] <- names(d_m)[1:3]
 
