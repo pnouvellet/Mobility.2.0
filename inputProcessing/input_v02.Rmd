@@ -149,6 +149,10 @@ country_D[-which(country_D %in% country_g)]
 f <- which(dM$google$region %in% country_D)
 dM$google <- dM$google[f,]
 
+to_eliminate <- intersect(country_D[-which(country_D %in% country_a)],country_D[-which(country_D %in% country_g)])
+f <- which(names(d) %in% to_eliminate)
+d <- d[,-f]
+
 ```
 
 
@@ -222,6 +226,57 @@ names(M$google) <- stream_google
 
 
 
+# some plots
+
+```{r}
+
+layout(matrix(1:6,3,2,byrow = FALSE))
+col1 <- c('red3','blue3','chartreuse4','cyan4','darkgoldenrod3','darkmagenta')
+d$dates <- as.Date(d$dates,format='%Y-%m-%d')
+add_c <- c(FALSE,TRUE)
+
+for(i in 2:ncol(d)){
+  plot(d$dates,d[,i],main = names(d)[i])
+  #apple
+  c <- 1
+  for(k in 1:length(stream_apple)){
+    y <- M$apple[[k]][,i]
+    
+    if((sum(!is.na(y))>0) & (c==1)){
+      plot(d$dates,y,pch=16,col=col1[k],main = 'apple',ylim = c(0,200))
+      c <- 2
+    }else if((sum(!is.na(y))>0) & (c==2)){
+      lines(d$dates,y,type = 'p',pch=16,col=col1[k])
+    }
+  }
+  if(c==1){
+    plot(d$dates,rep(1e2,nrow(d)),ylim = c(0,1),main = 'apple')
+  }
+  
+  #google
+  c <- 1
+  for(k in 1:length(stream_google)){
+    y <- M$google[[k]][,i]
+    if((sum(!is.na(y))>0) & (c==1)){
+      plot(d$dates,y,pch=16,col=col1[k],main = 'google',ylim = c(0,200))
+      c <- 2
+    }else if((sum(!is.na(y))>0 ) & (c==2)){
+      lines(d$dates,y,type = 'p',pch=16,col=col1[k])
+    }
+  }
+  if(c==1){
+    plot(d$dates,rep(1e2,nrow(d)),ylim = c(0,1),main = 'google')
+  }
+}
+
+
+```
+
+
+
+
+
+
 
 
 
@@ -280,6 +335,7 @@ d$I_active_transmission <- d$I_active_transmission[f1,]
 d$D_active_transmission <- d$D_active_transmission[f1,]
 
 ```
+
 
 
 
