@@ -229,43 +229,75 @@ names(M$google) <- stream_google
 # some plots
 
 ```{r}
-
+x_t_lab <- as.Date(c('01-01-2020','01-03-2020',
+                     '01-05-2020','01-07-2020',
+                     '01-09-2020'),format = '%d-%m-%Y')
 layout(matrix(1:6,3,2,byrow = FALSE))
 col1 <- c('red3','blue3','chartreuse4','cyan4','darkgoldenrod3','darkmagenta')
 d$dates <- as.Date(d$dates,format='%Y-%m-%d')
 add_c <- c(FALSE,TRUE)
+y_la <- c('','Deaths','','Mobility')
 
+
+# par(mar = c(bottom, left, top, right)) defauklt: c(5.1, 4.1, 4.1, 2.1)
 for(i in 2:ncol(d)){
-  plot(d$dates,d[,i],main = names(d)[i])
+  n_colf <- ((i %% 2) == 0) +1
+  par(mar = c(2, 4, 2, 1))
+  plot(d$dates,d[,i],main = names(d)[i],pch=16,cex=.8,
+       xlab = '',ylab = y_la[n_colf],bty = 'n',xaxt="n")
+  axis(side = 1,at = x_t_lab, labels = rep('',length(x_t_lab)))
   #apple
   c <- 1
   for(k in 1:length(stream_apple)){
     y <- M$apple[[k]][,i]
     
     if((sum(!is.na(y))>0) & (c==1)){
-      plot(d$dates,y,pch=16,col=col1[k],main = 'apple',ylim = c(0,200))
+      plot(d$dates,y,type = 'l', col=col1[k],
+           main = 'Apple',ylim = c(0,200),
+           xlab = '',ylab = y_la[n_colf+2],bty = 'n',xaxt="n")
+      axis(side = 1,at = x_t_lab, labels = rep('',length(x_t_lab)))
+      abline(h = 100,lty = 2, col='grey')
       c <- 2
     }else if((sum(!is.na(y))>0) & (c==2)){
-      lines(d$dates,y,type = 'p',pch=16,col=col1[k])
+      lines(d$dates,y,type = 'l', col=col1[k])
+      abline(h = 100,lty = 2, col='grey')
     }
   }
   if(c==1){
-    plot(d$dates,rep(1e2,nrow(d)),ylim = c(0,1),main = 'apple')
+    plot(d$dates,rep(1e3,nrow(d)),
+         ylim = c(0,200),main = 'Apple',
+         xlab = '',ylab = y_la[n_colf+2],bty = 'n',xaxt="n")
+      axis(side = 1,at = x_t_lab, labels = rep('',length(x_t_lab)))
   }
   
+  if(n_colf == 2){
+    legend('topleft',legend = c('Dr','Tr','Wk'),
+           col = col1[1:3],bty = 'n',lwd=1, seg.len = 1)
+  }
   #google
   c <- 1
   for(k in 1:length(stream_google)){
     y <- M$google[[k]][,i]
     if((sum(!is.na(y))>0) & (c==1)){
-      plot(d$dates,y,pch=16,col=col1[k],main = 'google',ylim = c(0,200))
+      plot(d$dates,y,type = 'l', col=col1[k],
+           main = 'Google',ylim = c(0,200),
+           xlab = '',ylab = y_la[n_colf+2],bty = 'n')
+      abline(h = 100,lty = 2, col='grey')
       c <- 2
     }else if((sum(!is.na(y))>0 ) & (c==2)){
-      lines(d$dates,y,type = 'p',pch=16,col=col1[k])
+      lines(d$dates,y,type = 'l', col=col1[k])
+      abline(h = 100,lty = 2, col='grey')
     }
   }
   if(c==1){
-    plot(d$dates,rep(1e2,nrow(d)),ylim = c(0,1),main = 'google')
+    plot(d$dates,rep(1e2,nrow(d)),ylim = c(0,1),
+         main = 'Google',
+         xlab = '',ylab = y_la[n_colf+2],bty = 'n',xaxt="n")
+    axis(side = 1,at = x_t_lab, labels = rep('',length(x_t_lab)))
+  }
+  if(n_colf == 2){
+    legend('topleft',legend = c('Gr','Pk','Rs','Rt','Tr','Wo'),
+           col = col1,bty='n',lwd=1, seg.len = 1)
   }
 }
 
