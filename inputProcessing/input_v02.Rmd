@@ -224,7 +224,78 @@ names(M$google) <- stream_google
 
 ```
 
+# get averaged - interpolated compound mobility
 
+```{r}
+M_process <- M
+f_d <- which(M[[1]][[1]]$dates %in% c('2020-02-17','2020-09-06'))
+
+for(i in 1:2){ # apple/google
+  if(i==1){
+    stream <- stream_apple
+  }else if(i==2){
+    stream <- stream_google
+  }
+  for(j in 1:length(stream)){#stream
+    for(k in 2:ncol(M[[i]][[j]])){ #country
+      
+      x <- M[[i]][[j]][,k]
+      if(sum(!is.na(x))<2){
+        M_process[[i]][[j]][,k+1] <- x
+      }else{
+        x2 <- na.approx(x,na.rm = FALSE)
+        x_roll <- zoo::rollmean(x2,k=7,align = c("center"))
+        # > mean(c(102,103,101, 99,104,106,102))
+        # [1] 102.4286
+        # > mean(c(103,101, 99,104,106,102,104))
+        # [1] 102.7143
+        x_roll <- c(rep(NA,3),x_roll,rep(NA,3))
+        x_roll[f_d[1]:(f_d[1]+2)] <- x_roll[(f_d[1]+3)]
+        x_roll[(f_d[2]-2):(f_d[2])] <-x_roll[(f_d[2]-3)]
+        
+        M_process[[i]][[j]][,k] <- x_roll
+      }
+    }
+  }
+}
+
+# plot(x,pch=16)
+# lines(x2,col='blue3',lwd=2)
+# lines(x_roll,col='red3',lwd=2)
+
+combine_mob <- function(x){
+  y <- x[[1]]
+  for(i in 2:ncol(y)){
+    temp <- matrix(NA,nrow(y),length(x))
+    for (j in 1:length(x)){
+      temp[,j] <- x[[j]][,i]
+    }
+    temp <- apply(temp,1,mean,na.rm=TRUE)
+    temp[!is.finite(temp)] <- NA
+    y[,i] <-temp
+  }
+  return(y)
+}
+
+M_process[['Combined']] <- list()
+M_process[['Combined']][['Apple_c']] <- combine_mob(x = list(M_process$apple$driving,
+                                                    M_process$apple$transit,
+                                                    M_process$apple$walking)) 
+
+
+
+M_process[['Combined']][['Google_c']] <- combine_mob(x = list(M_process$google$grocery_and_pharmacy_percent_change_from_baseline,
+                                                    M_process$google$retail_and_recreation_percent_change_from_baseline,
+                                                    M_process$google$transit_stations_percent_change_from_baseline,
+                                                    M_process$google$workplaces_percent_change_from_baseline)) 
+
+M_process[['Combined']][['AG']] <- combine_mob(x = list(M_process$Combined$Apple_c,
+                                                    M_process$Combined$Google_c)) 
+
+
+         
+
+```
 
 # some plots
 
@@ -250,16 +321,20 @@ for(i in 2:ncol(d)){
   c <- 1
   for(k in 1:length(stream_apple)){
     y <- M$apple[[k]][,i]
+    y2 <- M_process$apple[[k]][,i]
     
     if((sum(!is.na(y))>0) & (c==1)){
-      plot(d$dates,y,type = 'l', col=col1[k],
+      plot(d$dates,y,pch = 3, col=col1[k],cex=.2,
            main = 'Apple',ylim = c(0,200),
            xlab = '',ylab = y_la[n_colf+2],bty = 'n',xaxt="n")
       axis(side = 1,at = x_t_lab, labels = rep('',length(x_t_lab)))
+      lines(d$dates,y2, col=col1[k])
+      
       abline(h = 100,lty = 2, col='grey')
       c <- 2
     }else if((sum(!is.na(y))>0) & (c==2)){
-      lines(d$dates,y,type = 'l', col=col1[k])
+      lines(d$dates,y, pch = 3, col=col1[k], cex=.2, type='p')
+      lines(d$dates,y2, col=col1[k])
       abline(h = 100,lty = 2, col='grey')
     }
   }
@@ -268,6 +343,10 @@ for(i in 2:ncol(d)){
          ylim = c(0,200),main = 'Apple',
          xlab = '',ylab = y_la[n_colf+2],bty = 'n',xaxt="n")
       axis(side = 1,at = x_t_lab, labels = rep('',length(x_t_lab)))
+  }else{
+    # combined ones 
+      lines(d$dates,M_process$Combined$Apple_c[,i], col='grey50',lwd=2)
+      lines(d$dates,M_process$Combined$AG[,i], col='grey0',lwd=2)
   }
   
   if(n_colf == 2){
@@ -278,14 +357,18 @@ for(i in 2:ncol(d)){
   c <- 1
   for(k in 1:length(stream_google)){
     y <- M$google[[k]][,i]
+    y2 <- M_process$google[[k]][,i]
+    
     if((sum(!is.na(y))>0) & (c==1)){
-      plot(d$dates,y,type = 'l', col=col1[k],
+      plot(d$dates,y,pch = 3, col=col1[k],cex=.2,
            main = 'Google',ylim = c(0,200),
            xlab = '',ylab = y_la[n_colf+2],bty = 'n')
+      lines(d$dates,y2, col=col1[k])
       abline(h = 100,lty = 2, col='grey')
       c <- 2
     }else if((sum(!is.na(y))>0 ) & (c==2)){
-      lines(d$dates,y,type = 'l', col=col1[k])
+      lines(d$dates,y,pch = 3, col=col1[k],cex=.2, type='p')
+      lines(d$dates,y2, col=col1[k])
       abline(h = 100,lty = 2, col='grey')
     }
   }
@@ -294,10 +377,19 @@ for(i in 2:ncol(d)){
          main = 'Google',
          xlab = '',ylab = y_la[n_colf+2],bty = 'n',xaxt="n")
     axis(side = 1,at = x_t_lab, labels = rep('',length(x_t_lab)))
+  }else{
+    # combined ones 
+      lines(d$dates,M_process$Combined$Google_c[,i], col='grey50',lwd=2)
+      lines(d$dates,M_process$Combined$AG[,i], col= 'grey0',lwd=2)
   }
+  
+  #legends
   if(n_colf == 2){
     legend('topleft',legend = c('Gr','Pk','Rs','Rt','Tr','Wo'),
            col = col1,bty='n',lwd=1, seg.len = 1)
+  }else if(n_colf == 2){
+    legend('topleft',legend = c('A or G','C'),
+           col = c('grey50','grey0') ,bty='n',lwd=1, seg.len = 1)
   }
 }
 
