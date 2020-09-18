@@ -21,7 +21,8 @@ Like1 <- function(theta){
 
   # logL <- colSums(dpois(x = mD, lambda = Rt*Ot, log = TRUE) ,na.rm=TRUE)
   # logL <- colSums(dnbinom(x = mD, mu = Rt*Ot, size =  theta[2*N_geo+1], log = TRUE) ,na.rm=TRUE)
-  logL <- colSums(dnbinom(x = mD, mu = Rt*Ot, size = sqrt(Rt*Ot)* (theta[2*N_geo+1]), log = TRUE) ,na.rm=TRUE)
+  mu <- Rt*Ot
+  logL <- colSums(dnbinom(x = mD, mu = mu, size = sqrt(mu)* (theta[2*N_geo+1]), log = TRUE) ,na.rm=TRUE)
   # logL <- (dpois(x = mD, lambda = Rt*Ot, log = TRUE) )
   
   return(logL)

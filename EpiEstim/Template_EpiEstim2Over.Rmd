@@ -106,7 +106,7 @@ for (si in 1:2){
   ## check convergence
   
   print('########################################')
-  print(paste0('check convergence',date_week_finishing,' - ',Mdata,' - ',si)) 
+  print(paste0('check convergence - ',si)) 
   
   
   Acc <- colSums(diff(res$theta)!=0)/(rep-1)
@@ -167,8 +167,8 @@ for (si in 1:2){
   results_baseline <- list(median_R = temp,
                            low_R = temp,
                            up_R = temp,
-                           CV = temp,
-                           CV_below.2 = temp,
+                           S = temp,
+                           S_below.5 = temp,
                            mean = temp)
   
   for (i in 1:N_geo){
@@ -177,13 +177,27 @@ for (si in 1:2){
     results_baseline$low_R[f,i+1] <- low[f,i]
     results_baseline$up_R[f,i+1] <- up[f,i]
     
-    results_baseline$CV[f,i+1] <- sd_r[f,i]/mean_r[f,i]
-    results_baseline$CV_below.2[f,i+1] <- results_baseline$CV[f,i+1] < .2
+    results_baseline$S[f,i+1] <- sd_r[f,i]#/mean_r[f,i]
+    results_baseline$S_below.5[f,i+1] <- results_baseline$S[f,i+1] < .5
     results_baseline$mean[f,i+1] <- mean_r[f,i]
     
     # results_baseline$M_D[,i+1] <- M_D[,i]
   }
   results_baseline$DIC <- res$DIC
+  
+  #check results
+  layout(matrix(1:4,2,2))
+  for (i in 1:N_geo){
+    plot(D$dates,D[,i+1],main = country[i])
+    plot(x = D$dates, y = results_baseline$median_R[,i+1], col=rgb(0,0,1),ylim = c(0,5),type = 'l')
+    polygon(c(D$dates,rev(D$dates)), 
+            c(results_baseline$low_R[,i+1],rev(results_baseline$up_R[,i+1])),
+            col=rgb(0,0,1,.05),border = NA)
+    f <- which(results_baseline$S_below.5[,i+1])
+    lines(D$dates[f],rep(4.5,length(f)),pch='-',type = 'p')
+    
+    abline(h = 1,lty =2,col='red')
+  }
   
   
   output[[si]] <- list(resEpi = results_baseline)
