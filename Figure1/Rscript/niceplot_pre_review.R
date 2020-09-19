@@ -1,33 +1,33 @@
 niceplot <- function(i,res_summary, res_base,inputs){
   
-  fig.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/figs/',Mdata,'/',country[i],'_M_',Mdata,'.png')
+  fig.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/figs/',date_week_finishing,'/',country[i],'_M_',Mdata,'.png')
   png(filename = fig.name, width = 9, height=6, units="in", res = 300)
 
   xlim <- c(as.Date('15-02-2020',format='%d-%m-%Y'),range(inputs$D$dates)[2])
   layout(matrix(c(1,1,3,3,3,2,2,3,3,3),2,5,byrow = TRUE))
   # plot mobility
-  plot(inputs$D$dates,inputs$M_process_mat[[Mdata]][,k]/100,#main = country[i],
+  plot(inputs$mob_raw$dates,inputs$mob_raw[,i+1],#main = country[i],
        xlim = xlim,
-       ylim = c(0,max(c(1,inputs$M_process_mat[[Mdata]][,k]/100),na.rm=TRUE)),
+       ylim = c(0,max(c(1,inputs$mob_raw[,i+1]),na.rm=TRUE)),
        xlab = '',ylab = 'prop. mobility',pch=16,bty = 'n')
-  lines(inputs$D$dates,inputs$M_process_mat[[Mdata]][,k]/100,col='darkorchid3',lwd=2)
+  lines(inputs$mob_raw$dates,inputs$M[,i],col='darkorchid3',lwd=2)
   # lines(mob3[,i+1],col='red')
   abline(h=1,lwd=2,col='darkolivegreen4',lty=2)
   mtext('a)', side = 3, line = 1.5, adj = -.15, cex = 1)
   
   # plot Rt
-  f <- 1:nrow(res_base[[si]]$resEpi$S_below.5) #which(res_base$resEpi$CV_below.2[,i+1])
+  f <- 1:nrow(res_base[[si]]$resEpi$CV_below.2) #which(res_base$resEpi$CV_below.2[,i+1])
   x <- res_base[[si]]$resEpi$median_R$dates[f] # (epi_res$t_end2 )[f]
-  plot(x,res_base[[si]]$resEpi$median_R[f,k+1],
+  plot(x,res_base[[si]]$resEpi$median_R[f,i+1],
        xlim=xlim,
-       ylim = c(0,5),
+       ylim = c(0,6),
        type = 'l',col='black',lwd=2,bty = 'n',
        # main =country[i], 
        xlab = '',ylab = TeX('R_t'))
   mtext('b)', side = 3, line = 1.5, adj = -.15, cex = 1)
   
   polygon(c(x,rev(x)),
-          c(res_base[[si]]$resEpi$low_R[f,k+1],rev(res_base[[si]]$resEpi$up_R[f,k+1])), 
+          c(res_base[[si]]$resEpi$low_R[f,i+1],rev(res_base[[si]]$resEpi$up_R[f,i+1])), 
           col = rgb(0,0,0,.2), border = FALSE )
   abline(h=(1),lwd=2,col='darkolivegreen4',lty=2)
   
@@ -63,11 +63,11 @@ niceplot <- function(i,res_summary, res_base,inputs){
   }
   if (Change ==0){
     legend('topleft',legend = c(TeX('R_t^{D}'),TeX('R_t'),TeX('R_t^{obs}')), 
-           col = c(rgb(0,0,1),rgb(1,0,0),rgb(0,0,0)),lwd=2,bty='n',seg.len = .5)
+           col = c(rgb(0,0,1),rgb(1,0,0),rgb(0,0,0)),lwd=2,bty='n')
   }else{
     legend('topleft',legend = c(TeX('R_t^{D}'),TeX('R_t'),TeX('R_t^{obs}'),TeX('t_{change}')), 
            col = c(rgb(0,0,1),rgb(1,0,0),rgb(0,0,0),rgb(0,0,0)),lwd=2,
-           pch = c(rep(NA,3),16),bty='n',seg.len = .5)
+           pch = c(rep(NA,3),16),bty='n')
   }
   
   
@@ -75,7 +75,7 @@ niceplot <- function(i,res_summary, res_base,inputs){
   # plot Rt vs mob
  
   
-  f <- which(inputs$D[,k+1] > 0)
+  f <- which(inputs$D[,i+1] > 0)
   if (Change == 0){
     plot(res_summary$results_full_Rt_assumed_mob$median_R$mobility,
          res_summary$results_full_Rt_assumed_mob$median_R[ ,i+1],
@@ -84,7 +84,7 @@ niceplot <- function(i,res_summary, res_base,inputs){
          col=rgb(.4,.5,.1),lwd=2, 
          xlab = 'Prop. reduction in movement',
          ylab = TeX('R_t'),yaxt="n",
-         xlim = c(-1,1),bty = 'n',
+         xlim = c(0,1),bty = 'n',
          ylim = c((0.5),(6.5)))
     
     
@@ -107,7 +107,7 @@ niceplot <- function(i,res_summary, res_base,inputs){
          col=rgb(.8,.3,0),lwd=2, 
          xlab = 'Prop. reduction in movement',
          ylab = TeX('R_t'),yaxt="n",
-         xlim = c(-1,1),bty = 'n',
+         xlim = c(0,1),bty = 'n',
          ylim = c((0.5),(6.5)))
     
     
@@ -154,12 +154,11 @@ niceplot <- function(i,res_summary, res_base,inputs){
   #         col=rgb(1,0,1,.2),border=NA)
   
   #epiestim
-  f <- seq(4,nrow(res_base[[si]]$resEpi$S_below.5),by=7) 
-  which(res_base[[si]]$resEpi$S_below.5[,i+1])
+  f <- seq(4,nrow(res_base[[si]]$resEpi$CV_below.2),by=7) #which(res_base$resEpi$CV_below.2[,i+1])
   x <- 1-res_summary$results_meff$median_meff[f,i+1]-.5e-2
-  y <- res_base[[si]]$resEpi$median_R[f,k+1]
-  yplus <- res_base[[si]]$resEpi$up_R[f,k+1]
-  yminus <- res_base[[si]]$resEpi$low_R[f,k+1]
+  y <- res_base[[si]]$resEpi$median_R[f,i+1]
+  yplus <- res_base[[si]]$resEpi$up_R[f,i+1]
+  yminus <- res_base[[si]]$resEpi$low_R[f,i+1]
   n_est <- length(x)
   
   if(Change == 0){
@@ -197,12 +196,12 @@ niceplot <- function(i,res_summary, res_base,inputs){
   }
   
   
-  # if(Mdata == 'A'){
-    mtext(paste0(country[i],' - ',Mdata), side = 3,  line = 1.5, outer = FALSE,adj = -.15,font=2)
-  # }else{
-    # mtext(paste0(country[i],' (Google)'), side = 3,  line = 1.5, outer = FALSE,adj = -.15,font=2)
+  if(Mdata == 'A'){
+    mtext(paste0(country[i],' (Apple)'), side = 3,  line = 1.5, outer = FALSE,adj = -.15,font=2)
+  }else{
+    mtext(paste0(country[i],' (Google)'), side = 3,  line = 1.5, outer = FALSE,adj = -.15,font=2)
     
-  # }
+  }
   
   dev.off()
   

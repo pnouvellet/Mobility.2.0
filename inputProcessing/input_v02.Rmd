@@ -483,10 +483,18 @@ for (i in 1:N_days){
 
 # matrix of mobility and delayed version
 M_process_mat <- list()
-counter <- 1
+# counter <- 1
 for(i in 1:length(M_process)){
   for(j in 1:length(M_process[[i]])){
     M_process_mat[[as.character(names(M_process[[i]])[j])]] <- as.matrix(M_process[[i]][[j]][,-1])
+  }
+}
+# reformat mobility raw
+M_raw <- list()
+# counter <- 1
+for(i in 1:length(M)){
+  for(j in 1:length(M[[i]])){
+    M_raw[[as.character(names(M[[i]])[j])]] <- as.matrix(M[[i]][[j]][,-1])
   }
 }
 # as.matrix(M_process$$mob_combined_smooth[,-1])

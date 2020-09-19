@@ -24,7 +24,7 @@ opts_chunk$set(fig.path='figs/', fig.keep='high',
 # input data
 
 ```{r}
-source(file = '../inputProcessing/date_input.r')
+# source(file = '../inputProcessing/date_input.r')
 source(file = 'Rscript/niceplot.R')
 
 
@@ -37,56 +37,47 @@ source(file = 'Rscript/niceplot.R')
 
 ```{r}
 
-# for (date_num in length(dates_input)){
-date_num = length(dates_input)
+inputs<- readRDS(file=
+                   '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/inputs.rds')
+names(inputs)
+data_stream <- names(inputs$M_process_mat )
+# for(i in 1:length(data_stream)){
+#   dir.create(path = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/figs/',data_stream[i]))
+# }
 
-date_week_finishing <-  as.Date(dates_input[date_num],format = '%Y-%m-%d')
+
+res_base <- readRDS(file = 
+                      paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/EpiEstim/Rdata/output_EpiE.rds' ))
+
 
 si <- 2
-for (Mdata in c('A','G')){
-  # Mdata = 'A'
+for (Mdata in data_stream[1]){
+  # Mdata = data_stream[1]
   
-  inputs<- readRDS(file=paste0(
-    '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/',
-    date_week_finishing,'_inputs_from_',Mdata,'.rds'))
   
-  res_base <- readRDS(file=paste0(
-    '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/EpiEstim/Rdata/',
-    date_week_finishing,'_output_from_',Mdata,'.rds'))
   
-  Tb_best <- readRDS(file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/TableModels_comparision/RData/',
-                                   date_week_finishing,'_output_over_form_',Mdata,'.rds' ))$Tb_best
   
-   Tb_temp <- readRDS(file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/TableModels_comparision/RData/',
-                                   date_week_finishing,'_output_over_form_',Mdata,'.rds' ))$Tb1
-   
   
-  n_country <- nrow(Tb_best)
-  country <- Tb_best$country
+  res_m <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/output_over_form_',Mdata,'.rds' ))[[si]]
+  
+  
+  res_summary <- readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/output2_over_form_',Mdata,'.rds' ) )[[si]]
+  
+  
+  
+  n_country <- length(res_m$country)
+  country <- res_m$country
+  
+  country_initial <- names(inputs$D)[-1]
+  
   
   for (i in 1:n_country){
-    # i=1
-    if (Tb_best$change[i] == 'no'){
-      Change <- 0
-      res_summary <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/',
-                                             date_week_finishing,'_output2_over_form_',Mdata,'.rds' ) )[[si]]
-      
-      res_m <- readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/',
-                                             date_week_finishing,'_output_over_form_',Mdata,'.rds' ) )[[si]]
-      
-    }else{
-      Change <- 1
-      res_summary <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/',
-                                             date_week_finishing,'_output2_over_form_',Mdata,'.rds' ) )[[si]]
-      
-      res_m <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/',
-                                             date_week_finishing,'_output_over_form_',Mdata,'.rds' ) )[[si]]
-    }
     
+    k <- which(country_initial %in% country[i])
+    Change <- 0
     niceplot(i, res_summary, res_base, inputs)
     
   }
-  
 }
 
 ```
