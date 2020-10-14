@@ -1,6 +1,6 @@
 niceplot <- function(i,res_summary, res_base,inputs){
   
-  fig.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/figs/',Mdata,'/',country[i],'_M_',Mdata,'.png')
+  fig.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/figs/',Mdata,'/',country[i],'.png')
   png(filename = fig.name, width = 9, height=6, units="in", res = 300)
 
   xlim <- c(as.Date('15-02-2020',format='%d-%m-%Y'),range(inputs$D$dates)[2])

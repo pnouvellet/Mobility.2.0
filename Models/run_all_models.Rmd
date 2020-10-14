@@ -28,53 +28,12 @@ opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0
 
 ```{r}
 
-d <- readRDS('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/inputs.rds')
-names(d)
+# d <- readRDS('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/inputs.rds')
+# names(d)
 
-c <- 1 #country
-si <- 1 # SI
-
+d <- readRDS('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/Models/Rdata/d_infer.rds')
 
 
-
-
-
-# M <- (d$W[[si]]$W)
-# M <- (d$Ot[[si]]$Ot)
-# M <- d$H
-
-# mobility streams
-n_stream <- names(d$M_process_mat)
-M <- matrix(NA,nrow = nrow(d$D),ncol = length(n_stream))
-for(i in 1:length(n_stream)){
-  M[,i] <- d$M_process_mat[[i]][,c]
-}
-colnames(M) <- n_stream
-M_tim <- M[,-which(colSums(!is.na(M)) == 0)]
-
-d_infer <- list(D = d$D[,c(1,c+1)],
-                Ot = d$Ot[[si]]$Ot[,c],
-                W = d$W[[si]]$W,
-                H = d$H,
-                M = M,
-                M_tim = M_tim)
-
-######################################
-
-# allowed changes in relationship and week with inference
-# c("2020-03-02","2020-04-06","2020-05-04","2020-06-01","2020-07-06")
-allowed_change <- c("2020-03-02","2020-04-06","2020-05-04","2020-06-01","2020-07-06")
-
-
-weekly_D <- colSums(matrix(d_infer$D[,2],nrow = 7,ncol = nrow(d_infer$D)/7, byrow = FALSE))
-day_start_week <- d_infer$D$dates[seq(1,length( d_infer$D$dates),by=7)]
-plot(weekly_D)
-thresholds_death <- which(weekly_D > 10)
-if(length(thresholds_death)>16){
-  possible_change <- thresholds_death[-c(seq(1,8),
-                                         seq(length(thresholds_death)-7,length(thresholds_death)))]
-  day_start_week[possible_change]
-}
 
 
 ```
@@ -87,45 +46,24 @@ if(length(thresholds_death)>16){
 ```{r}
 
 
-source(file = '../inputProcessing/date_input.r')
+rep <- 1e2
+c<-1
 
-
-rep <- 1e4
-# rep_sim <- 1e4
-
-
-for (date_num in 1:length(dates_input)){
-  
-  date_week_finishing <-  as.Date(dates_input[date_num],format = '%Y-%m-%d')
-  output <- list()
-  
-  # date_week_finishing <-  as.Date('29/03/2020',format = '%d/%m/%Y')
-  # # si <- 2
-  # rep <- 1e2
-  # rep_sim <- 1e2
-  
-  for (Mdata in c('A','G')){
-    
-    inputs<- readRDS(file=paste0(
-      '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/',
-      date_week_finishing,'_inputs_from_',Mdata,'.rds'))
-    
-    for (si in 1:2){
       
       ########################################
       ####inputs
-      D <- inputs$D
-      M <- inputs$M
-      Ot <- inputs$Ot[[si]]$Ot
-      W <- inputs$W[[si]]$W
-      H <- inputs$H
-      SI <- inputs$SI[[si]]
-      delta_id <- inputs$delta_id
+      D <- d[[1]][[c]]$D
+      M <- d[[1]][[c]]$M_tim
+      Ot <- d[[1]][[c]]$Ot
+      W <- d[[1]][[c]]$W
+      H <- d[[1]][[c]]$H
+      # SI <- inputs$SI[[si]]
+      # delta_id <- inputs$delta_id
       #
-      country <- names(D)[-1]
+      country <-  names(d[[1]])[c]
       
       mD <- as.matrix(D[,-1])
-      N_geo <- ncol(D)-1
+      N_geo <- ncol(M)
       N_days <- nrow(D)
       
       N_week <- nrow(D)/7

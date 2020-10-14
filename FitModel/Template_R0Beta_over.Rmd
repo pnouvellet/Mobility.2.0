@@ -52,9 +52,9 @@ for (Mdata in data_stream){
   ########################################
   ####inputs
   D0 <- inputs$D
-  M <- inputs$M_process_mat[[Mdata]]
+  Mold <- inputs$M_process_mat[[Mdata]]
   
-  f_country_with_Mdata <- which(colSums(!is.na(M))>0)
+  f_country_with_Mdata <- which(colSums(!is.na(Mold))>0)
   D <- inputs$D[,c(1,1+f_country_with_Mdata)]
   M1 <- inputs$M_process_mat[[Mdata]][,f_country_with_Mdata]
   M <- M1/100
@@ -73,7 +73,7 @@ for (Mdata in data_stream){
   N_days <- nrow(D)
   
   N_week <- nrow(D)/7
-  
+ 
   # prerp MCMC
   # epi
   R0 <- 5
@@ -211,7 +211,7 @@ for (Mdata in data_stream){
   
   n_d <- 1e3
   Rt_assumed_mob <- array(NA,dim = c(n_d,N_geo,rep))
-  x <-  matrix(seq(0,1,length.out = n_d),n_d,N_geo,byrow = FALSE)
+  x <-  matrix(seq(-1,1,length.out = n_d),n_d,N_geo,byrow = FALSE)
   
   for (j in 1:rep){
     R_daily <- Rt_fun(theta = res_m$resMCMC$theta[j,], x = 1-x )
@@ -224,9 +224,6 @@ for (Mdata in data_stream){
   ## summaries
   
   ### Summary for Rt daily and Rt_D2
-  
-  
-  
   # format outputs
   temp <- D
   temp[,-1] <- NA

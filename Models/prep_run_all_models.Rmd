@@ -72,6 +72,7 @@ for (si in 1:2){ # SI
     day_start_week <- d_i$D$dates[seq(1,length( d_i$D$dates),by=7)]
     if(si==1) {
       plot(weekly_D,main = names(d$D)[c+1])
+      lines(which(weekly_D>10),weekly_D[weekly_D>10],type = 'p', pch=16)
       abline(h=10,lty = 2, col='red3')
     }
     thresholds_death <- seq(which(weekly_D > 10)[1],tail(which(weekly_D > 10),1))
@@ -115,4 +116,5 @@ for (i in 1:(ncol(d$D)-1)){
   print(paste0(i,' - ',names(d_infer[[1]])[i],' : ', temp ))
 }
  
+saveRDS(object = d_infer, file = '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/Models/RData/d_infer.rds')
 ```

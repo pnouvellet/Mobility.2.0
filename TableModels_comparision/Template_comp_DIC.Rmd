@@ -1,0 +1,75 @@
+---
+title: "R0Beta"
+author: "Pierre Nouvellet"
+date: "2019-07"
+---
+
+```{r , include = FALSE, message = FALSE, warning = FALSE, error = FALSE}
+library(knitr)
+library(Hmisc)
+library(EpiEstim)
+library(zoo)
+library(latex2exp)
+
+opts_chunk$set(collapse = TRUE)
+
+opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/figs/', fig.keep='high', 
+               dev=c('png'), fig.width=9, fig.height=6, cache=FALSE,
+               tidy=FALSE, warning=FALSE, fig.show="asis"
+)
+
+```
+
+# input data
+
+
+```{r}
+
+
+inputs<- readRDS(file=
+                   '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/inputs.rds')
+names(inputs)
+data_stream <- names(inputs$M_process_mat )
+
+DICs1 <- data.frame(country = names(inputs$D)[-1],matrix(NA,1,length(data_stream)))
+names(DICs1)[-1] <- data_stream
+DICs2 <- DICs1
+names(DICs2)[-1] <- paste0(data_stream,'_tc')
+                           
+si=2
+for (Mdata in data_stream){
+  
+  res_m1 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/output_over_form_',Mdata,'.rds' ))[[si]]
+  res_m2 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/output_over_form_',Mdata,'.rds' ))[[si]]
+  
+  country_infer <- (res_m1$country)
+  for (i in 1:length(country_infer)){
+    fc <- which(names(DICs1) %in% Mdata)
+    fr <- which(DICs1$country %in% country_infer[i])
+    DICs1[fr,fc] <- round(res_m1$resMCMC$DIC[i])
+    DICs2[fr,fc] <- round(res_m2$resMCMC$DIC[i])
+    
+  }
+}
+DICs3 <- merge(x = DICs1,y = DICs2,by = 'country')
+
+DICs4 <- DICs3[,1:6]
+names(DICs4)[-1] <- c('best','value','best_Tc','value','diff')
+for (i in 1:nrow(DICs4)){
+  f <- which(DICs1[i,2:ncol(DICs1)] %in% min(DICs1[i,2:ncol(DICs1)],na.rm=TRUE))
+  if(length(f)>1) f <- tail(f,1)
+  DICs4[i,2] <- names(DICs1)[f+1]
+  DICs4[i,3] <- min(DICs1[i,2:ncol(DICs1)],na.rm=TRUE)
+  
+  f <- which(DICs2[i,2:ncol(DICs1)] %in% min(DICs2[i,2:ncol(DICs1)],na.rm=TRUE))
+  if(length(f)>1) f <- tail(f,1)
+  DICs4[i,4] <- names(DICs2)[f+1]
+  DICs4[i,5] <- min(DICs2[i,2:ncol(DICs2)],na.rm=TRUE)
+}
+DICs4[,6] <- DICs4[,3]-DICs4[,5]
+
+write.csv(DICs1,file = 'DICs1.csv')
+write.csv(DICs2,file = 'DICs2.csv')
+write.csv(DICs3,file = 'DICs3.csv')
+write.csv(DICs4,file = 'DICs4.csv')
+```

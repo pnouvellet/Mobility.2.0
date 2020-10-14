@@ -11,8 +11,9 @@ Rt_fun <- function(theta,x){
   R0 <- rep(1,nrow(x)) %*% t(theta[(1-1)*N_geo+ (1:N_geo)])
   B <- rep(1,nrow(x)) %*% t(theta[(2-1)*N_geo+ (1:N_geo)])
   for (i in 1:N_geo){
-    R0[ (theta[(5-1)*N_geo+ (i) ]): nrow(x) ,i] <- theta[(3-1)*N_geo+ (i)]
-    B[ (theta[(5-1)*N_geo+ (i) ]): nrow(x) ,i] <- theta[(4-1)*N_geo+ (i)]
+    f_c <-  theta[(5-1)*N_geo+ (i) ] 
+    R0[ f_c: nrow(x) ,i] <- theta[(3-1)*N_geo+ (i)]
+    B[ f_c: nrow(x) ,i] <- theta[(4-1)*N_geo+ (i)]
   }
   
   # K <- rep(1,nrow(x)) %*% t(theta[(3-1)*N_geo+ (1:N_geo)])

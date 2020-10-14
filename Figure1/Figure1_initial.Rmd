@@ -51,10 +51,10 @@ res_base <- readRDS(file =
 
 
 si <- 2
-for (Mdata in data_stream[1]){
+for (Mdata in data_stream){
   # Mdata = data_stream[1]
-  
-  
+  fd.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/figs/',Mdata)
+  dir.create(fd.name)
   
   
   

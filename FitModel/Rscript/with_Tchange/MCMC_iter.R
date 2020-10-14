@@ -59,8 +59,10 @@ MCMC_iter <- function(iter,theta0,s){
       }else if (j %in% c(2,4)){
         Ts[J] <- Ts[J]+(s[J]*rnorm(N_geo,0,1))
       
-        }else if (j %in% c(5)){
-        Ts[J] <- round(Ts[J]+(s[J]*rnorm(N_geo,0,1)))
+      }else if (j %in% c(5)){
+        # Ts[J] <- sample(x = 1:length(allowed_change),size = N_geo,replace = TRUE)
+          # Ts[J] <- Ts[J]+round(s[J]*rnorm(N_geo,0,1))
+        Ts[J] <- prior_theta[J,1] + sample(x = 0:20,size = N_geo,replace = TRUE)
         
       }else{
         Ts[J] <- Ts[J]*exp(s[J]*rnorm(1,0,1))
@@ -73,7 +75,7 @@ MCMC_iter <- function(iter,theta0,s){
       
       
       #get the ratio with previous value of parameter and correct for porposal (and, only for initial conditions, prior distribution)
-      if (j %in% c(1,3)){
+      if (j %in% c(1,3,6)){
         r <- exp(Lint-L1)*Ts[J]/theta0[J] * exp(-1*(Ts[N_geo*5+1]-theta0[N_geo*5+1]))#
       }else{
         r <- exp(Lint-L1) * exp(-1*(Ts[N_geo*5+1]-theta0[N_geo*5+1]))
