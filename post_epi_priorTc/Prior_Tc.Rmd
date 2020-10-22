@@ -34,6 +34,8 @@ par(mar = c(2,2,2,1))
 inputs<- readRDS(file=
                    '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/inputs.rds')
 names(inputs)
+mu_id = 18.8
+# inputs$delta_id
 data_stream <- names(inputs$M_process_mat )
 # for(i in 1:length(data_stream)){
 #   dir.create(path = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/figs/',data_stream[i]))
@@ -65,7 +67,9 @@ for (Mdata in data_stream[12]){
     
     # plot Rt against rough mobility
     f <- seq(4,nrow(res_base[[si]]$resEpi$S_below.5),by=7) 
-    f <- f[which(res_base[[si]]$resEpi$S_below.5[f,i+1])]
+    # f <- f[which(res_base[[si]]$resEpi$S_below.5[f,i+1])]
+    f <- f[which(!is.na(res_base[[si]]$resEpi$median_R[f,i+1]))]
+    weight <- 1/res_base[[si]]$resEpi$S[f,i+1]
     x <- 1- H %*% ( m[,i])  #1-res_summary$results_meff$median_meff[f,i+1]-.5e-2
     x <- x[f]
     y <- res_base[[si]]$resEpi$median_R[f,i+1]
@@ -73,36 +77,41 @@ for (Mdata in data_stream[12]){
     yminus <- res_base[[si]]$resEpi$low_R[f,i+1]
     n_est <- length(x)
     
-    allowed_change <- as.Date(c("2020-03-02","2020-04-06",
+    allowed_change <- as.Date(c("2020-04-06",
                             "2020-05-04","2020-06-01","2020-07-06"),
                           format = '%Y-%m-%d')
+    allowed_change_delay <- allowed_change + mu_id 
+    
     
     AIC <- rep(NA,length(allowed_change)+1)
     # models
-    m0 <- glm(log(y) ~ x)
+    m0 <- glm(log(y) ~ x,weights = weight)
     summary(m0)
     AIC[1] <- m0$aic
     # tc 
     for (k in 1:length(allowed_change)){
-      f1a <- which(inputs$D$dates[f] <= allowed_change[k])
-      f1b <- which(inputs$D$dates[f] > allowed_change[k])
+      f1a <- which(inputs$D$dates[f] <= allowed_change_delay[k])
+      f1b <- which(inputs$D$dates[f] > allowed_change_delay[k])
       if(length(f1a)>2 & length(f1b)>2  ){
-        m1a <- glm(log(y[f1a]) ~ x[f1a])
-        m1b <- glm(log(y[f1b]) ~ x[f1b])
+        m1a <- glm(log(y[f1a]) ~ x[f1a],weights = weight[f1a])
+        m1b <- glm(log(y[f1b]) ~ x[f1b],weights = weight[f1b])
         summary(m1a)
         summary(m1b)
         
         AIC[k+1] <- m1a$aic + m1b$aic
       }
     }
+    
+    AIC2 <- round(AIC/5)*5
     #best predictions
-    k <- which(AIC[2:(length(allowed_change)+1)] == min(AIC[2:(length(allowed_change)+1)],na.rm = TRUE))
+    k <- which(AIC2[2:(length(allowed_change)+1)] == min(AIC2[2:(length(allowed_change)+1)],na.rm = TRUE))
+    k <- tail(k,1)
     x_pred <- seq(from = -1,to = 1,length.out = 1e2)
     
     pred <- exp(m0$coefficients[1] + m0$coefficients[2]*x_pred)
     # if (sum(!is.na(AIC))
-      f1a <- which(inputs$D$dates[f] <= allowed_change[k])
-      f1b <- which(inputs$D$dates[f] > allowed_change[k])
+      f1a <- which(inputs$D$dates[f] <= allowed_change_delay[k])
+      f1b <- which(inputs$D$dates[f] > allowed_change_delay[k])
       
       m1a <- glm(log(y[f1a]) ~ x[f1a])
       m1b <- glm(log(y[f1b]) ~ x[f1b])
@@ -113,6 +122,7 @@ for (Mdata in data_stream[12]){
     
         
     ### plot
+      # 
 
     Hmisc::errbar(x = inputs$D$dates[f],
                   y = y,
@@ -123,15 +133,16 @@ for (Mdata in data_stream[12]){
                   col = c(rep(rgb(0,0,0),n_est-0),rep('red4',0)),
                   errbar.col = c(rep(rgb(0,0,0),n_est-0),rep('red4',0)),bty='n')
     
-    abline(v = allowed_change[k],lty = 2,lwd=2,col='darkorange')
+    abline(v = allowed_change_delay[k],lty = 2,lwd=2,col='darkorange')
     title(country[i])
+    # f_new <-  n_est - length(which(f<=mtc))
     Hmisc::errbar(x = x,
                   y = y,
                   yplus = yplus,
                   yminus = yminus,
                   main = country[i],
-                  col = c(rep(rgb(0,0,0),n_est-0),rep('red4',0)),
-                  errbar.col = c(rep(rgb(0,0,0),n_est-0),rep('red4',0)),bty='n')
+                  col = c(rep(rgb(0,0,0),n_est-length(f1b)),rep('red4',length(f1b))),
+                  errbar.col = c(rep(rgb(0,0,0),n_est-length(f1b)),rep('red4',length(f1b))),bty='n')
     
     # if (k==1){
     lines(x_pred,pred,lwd=2,col='black')

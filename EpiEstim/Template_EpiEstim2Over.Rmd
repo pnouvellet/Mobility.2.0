@@ -32,7 +32,7 @@ inputs<- readRDS(file=
                    '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/inputs.rds')
 names(inputs)
 
-rep <- 1e2
+rep <- 1e4#2e5
 
 
 

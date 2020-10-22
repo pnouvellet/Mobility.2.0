@@ -1,0 +1,111 @@
+---
+title: "R0Beta"
+author: "Pierre Nouvellet"
+date: "2019-07"
+---
+
+```{r , include = FALSE, message = FALSE, warning = FALSE, error = FALSE}
+library(knitr)
+library(Hmisc)
+library(EpiEstim)
+library(zoo)
+library(latex2exp)
+
+opts_chunk$set(collapse = TRUE)
+
+opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/TableModels_comparision/', fig.keep='high', 
+               dev=c('png'), fig.width=9, fig.height=6, cache=FALSE,
+               tidy=FALSE, warning=FALSE, fig.show="asis"
+)
+
+```
+
+# input data
+
+
+```{r}
+
+
+inputs<- readRDS(file=
+                   '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/inputs.rds')
+names(inputs)
+data_stream <- names(inputs$M_process_mat )
+
+DICs1 <- data.frame(country = names(inputs$D)[-1],matrix(NA,1,length(data_stream)))
+names(DICs1)[-1] <- data_stream
+DICs2 <- DICs1
+names(DICs2)[-1] <- paste0(data_stream,'_tc')
+                           
+si=2
+for (Mdata in data_stream){
+  
+  res_m1 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/output_over_form_',Mdata,'.rds' ))[[si]]
+  res_m2 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/output_over_form_',Mdata,'.rds' ))[[si]]
+  
+  country_infer <- (res_m1$country)
+  for (i in 1:length(country_infer)){
+    fc <- which(names(DICs1) %in% Mdata)
+    fr <- which(DICs1$country %in% country_infer[i])
+    DICs1[fr,fc] <- round(res_m1$resMCMC$DIC[i])
+    DICs2[fr,fc] <- round(res_m2$resMCMC$DIC[i])
+    
+  }
+}
+DICs3 <- DICs1
+f_change <- c()
+for (i in 1:length(country_infer)){
+  if((DICs1$AG[i] - DICs2$AG[i]) > 10){
+    DICs3[i,] <- DICs2[i,]
+    f_change <- c(f_change,i)
+  }
+}
+
+sum_Dic <- DICs3[,2:12] - DICs3[,13]
+sum_Dic <- cbind(sum_Dic[,c(10,1,2,3)],NA,sum_Dic[,c(11,4,5,6,7,8,9)])
+names(sum_Dic) <- c('A','Driving (A)','Transit (A)','Walking (A)','',
+                    'G','Grocery (G)','Park (G)','Resid. (G)','Retail (G)',
+                    'Transit (G)','Work (G)')
+
+boxplot(sum_Dic,las=2)
+
+# par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
+par(mar = c(5.5,4,2,1),bty = 'n')
+
+t_sum_Dic <- sum_Dic
+for(i in 1:ncol(sum_Dic)){
+  t_sum_Dic[,i] <- sign(sum_Dic[,i]) * sqrt(sign(sum_Dic[,i])*sum_Dic[,i])
+}
+boxplot(t_sum_Dic,las=2,yaxt='n',ylab = 'DIC difference with A-G combined')
+abline(h=1,lwd=2,col = 'red3')
+
+at_y <- c(-100,-10,0,10,100)
+axis(side = 2,at = sign(at_y) * sqrt(at_y*sign(at_y)), labels = at_y)
+
+
+# only for those with changes
+par(mar = c(5.5,2,2,1),bty = 'n')
+
+
+boxplot(t_sum_Dic[f_change,],las=2,yaxt='n',ylab = 'DIC difference with A-G combined')
+abline(h=1,lwd=2,col = 'red3')
+
+at_y <- c(-100,-10,0,10,100)
+axis(side = 2,at = sign(at_y) * sqrt(at_y*sign(at_y)), labels = at_y)
+
+write.csv(x = DICs3,file = 'Best_tc_no_tc_AG.csv')
+
+
+# where substantial difference DIC_diff<-30
+subs_change <- c()
+for(i in 1:nrow(sum_Dic)){
+  f_20 <- which(sum_Dic[i,]< (-20))
+  if(length(f_20)>0){
+    temp1 <- country_infer[i]
+    temp2 <- paste0(sum_Dic[ i, f_20 ], collapse = ', ')
+    temp3 <- paste0(names(sum_Dic)[ f_20 ], collapse = ', ')
+    subs_change <- rbind(subs_change,c(temp1,temp2,temp3))
+  }
+  
+}
+write.csv(x = subs_change,file = 'subs_change.csv')
+```
