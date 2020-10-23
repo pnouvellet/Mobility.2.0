@@ -28,7 +28,7 @@ opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0
 
 
 
-rep <- 1e3#2e5
+rep <- 1e5
 # rep_sim <- 1e3
 
 
@@ -41,7 +41,7 @@ inputs<- readRDS(file=
 names(inputs)
 data_stream <- names(inputs$M_process_mat )
 
-for (Mdata in data_stream[12]){
+for (Mdata in data_stream){
   # Mdata = data_stream[1]
   
   

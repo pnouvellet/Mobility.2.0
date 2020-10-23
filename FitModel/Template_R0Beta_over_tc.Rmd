@@ -28,7 +28,7 @@ opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0
 
 
 
-rep <- 2e5
+rep <- 1e5
 # rep_sim <- 1e3
 
 
@@ -46,7 +46,7 @@ data_stream <- names(inputs$M_process_mat )
 #                           format = '%Y-%m-%d')
 prior_tc <- readRDS(file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/post_epi_priorTc/','AG','_prior_tc_.rds'))
 
-for (Mdata in data_stream[12]){
+for (Mdata in data_stream){
   # Mdata = data_stream[12]
   
   
@@ -142,9 +142,9 @@ for (Mdata in data_stream[12]){
   
   ########################################
   ## check convergence
-  plot(res$theta[,N_geo*3+20],res$theta[,N_geo*2+20])
-  plot(res$theta[,N_geo*1+20],res$theta[,N_geo*0+20])
-  
+  # plot(res$theta[,N_geo*3+20],res$theta[,N_geo*2+20])
+  # plot(res$theta[,N_geo*1+20],res$theta[,N_geo*0+20])
+  # 
   print('########################################')
   print(paste0('check convergence - ',Mdata,' - ',si)) 
   
