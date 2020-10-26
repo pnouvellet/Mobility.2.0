@@ -14,7 +14,7 @@ library(latex2exp)
 opts_chunk$set(collapse = TRUE)
 
 opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/figs/', fig.keep='high', 
-               dev=c('png'), fig.width=9, fig.height=6, cache=FALSE,
+               dev=c('png'), fig.width=6, fig.height=6, cache=FALSE,
                tidy=FALSE, warning=FALSE, fig.show="asis"
 )
 
@@ -28,7 +28,7 @@ opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0
 
 
 
-rep <- 1e5
+
 # rep_sim <- 1e3
 
 
@@ -45,15 +45,16 @@ data_stream <- names(inputs$M_process_mat )
 #                             "2020-05-04","2020-06-01","2020-07-06"),
 #                           format = '%Y-%m-%d')
 prior_tc <- readRDS(file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/post_epi_priorTc/','AG','_prior_tc_.rds'))
+# prior_tc <- readRDS(file ='../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/post_epi_priorTc/AG_prior_tc.rds')
 
-for (Mdata in data_stream){
+for (Mdata in data_stream[12]){
   # Mdata = data_stream[12]
   
   
   
   # for (si in 2){
   si=2
-  
+  rep <- 1e5
   ########################################
   ####inputs
   D0 <- inputs$D
@@ -138,7 +139,7 @@ for (Mdata in data_stream){
                    theta0 = theta0,
                    s = sigma, 
                    repli_adapt = 10, 
-                   within_iter = rep/10)
+                   within_iter = rep/100)
   
   ########################################
   ## check convergence
@@ -180,7 +181,7 @@ for (Mdata in data_stream){
   
   ## margin for side 2 is 7 lines in siz
   layout(1)
-  par(mar = c(7,4,4,2) + 0.1) ## default is c(5,4,4,2) + 0.1
+  # par(mar = c(7,4,4,2) + 0.1) ## default is c(5,4,4,2) + 0.1
   
   errbar(1:N_geo,R0s[1,],R0s[2,],R0s[3,],
          xlab = '', ylab = TeX('R_0'), bty = 'n',xaxt = "n",ylim=c(0,10))
