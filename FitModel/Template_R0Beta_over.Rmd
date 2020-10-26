@@ -41,7 +41,7 @@ inputs<- readRDS(file=
 names(inputs)
 data_stream <- names(inputs$M_process_mat )
 
-for (Mdata in data_stream[12]){
+for (Mdata in data_stream){
   # Mdata = data_stream[1]
   
   

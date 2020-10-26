@@ -47,7 +47,7 @@ data_stream <- names(inputs$M_process_mat )
 prior_tc <- readRDS(file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/post_epi_priorTc/','AG','_prior_tc_.rds'))
 # prior_tc <- readRDS(file ='../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/post_epi_priorTc/AG_prior_tc.rds')
 
-for (Mdata in data_stream[12]){
+for (Mdata in data_stream){
   # Mdata = data_stream[12]
   
   
