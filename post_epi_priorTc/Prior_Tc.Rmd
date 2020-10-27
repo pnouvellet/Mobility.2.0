@@ -77,8 +77,7 @@ for (Mdata in data_stream[12]){
     yminus <- res_base[[si]]$resEpi$low_R[f,i+1]
     n_est <- length(x)
     
-    allowed_change <- as.Date(c("2020-04-06",
-                            "2020-05-04","2020-06-01","2020-07-06"),
+    allowed_change <- as.Date(c("2020-05-04","2020-06-01","2020-07-06"),
                           format = '%Y-%m-%d')
     allowed_change_delay <- allowed_change + mu_id 
     
@@ -101,11 +100,14 @@ for (Mdata in data_stream[12]){
         AIC[k+1] <- m1a$aic + m1b$aic
       }
     }
-    
-    AIC2 <- round(AIC/5)*5
+    AIC2 <- AIC[2:(length(allowed_change)+1)] - AIC[2]
+    # AIC2 <- round(AIC/5)*5
     #best predictions
-    k <- which(AIC2[2:(length(allowed_change)+1)] == min(AIC2[2:(length(allowed_change)+1)],na.rm = TRUE))
-    k <- tail(k,1)
+    k <- which(AIC2 == min(AIC2,na.rm = TRUE))
+    if(AIC2[k]> (-5)){
+      k <- 1
+    }
+    # k <- tail(k,1)
     x_pred <- seq(from = -1,to = 1,length.out = 1e2)
     
     pred <- exp(m0$coefficients[1] + m0$coefficients[2]*x_pred)
@@ -128,12 +130,13 @@ for (Mdata in data_stream[12]){
                   y = y,
                   yplus = yplus,
                   yminus = yminus,
-                  xlim = c(allowed_change[1],range(inputs$D$dates)[2]),
+                  xlim = c(allowed_change[1]-60,range(inputs$D$dates)[2]),
                   main = country[i],
                   col = c(rep(rgb(0,0,0),n_est-0),rep('red4',0)),
                   errbar.col = c(rep(rgb(0,0,0),n_est-0),rep('red4',0)),bty='n')
     
     abline(v = allowed_change_delay[k],lty = 2,lwd=2,col='darkorange')
+    abline(v = allowed_change[k],lty = 2,lwd=2,col='red3')
     title(country[i])
     # f_new <-  n_est - length(which(f<=mtc))
     Hmisc::errbar(x = x,

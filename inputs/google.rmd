@@ -34,7 +34,7 @@ load and clean mobility data.
 
 ```{r, echo = FALSE}
 
-d_m <- read.csv(file=paste0(path_s,'inputs/applemobilitytrends-2020-10-24.csv'),
+d_m <- read.csv(file=paste0(path_s,'inputs/applemobilitytrends-2020-10-25.csv'),
                             stringsAsFactors = FALSE)
 
 	
@@ -77,10 +77,13 @@ names(b)[-c(1:3)] <- sub(x=paste0('X',sub(x =names(b)[-c(1:3)],pattern = '-',rep
 
 d_g <- b
 tail(names(d_g))
-
+# fill in === to be removed
+d_g <- cbind(d_g,d_g[,255],d_g[,255])
+names(d_g)[256:257] <- c("X2020.10.24","X2020.10.25")
+tail(names(d_g))
 # trim datasets
-d_g <- d_g[,1:which(names(d_g) %in% 'X2020.09.13')]
-d_m <- d_m[,1:which(names(d_m) %in% 'X2020.09.13')]
+d_g <- d_g[,1:which(names(d_g) %in% 'X2020.10.25')]
+d_m <- d_m[,1:which(names(d_m) %in% 'X2020.10.25')]
 tail(names(d_g))
 tail(names(d_m))
 

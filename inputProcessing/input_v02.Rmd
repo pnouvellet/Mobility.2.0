@@ -132,6 +132,7 @@ dM$apple$region[which(dM$apple$region %in% 'United States')] <- 'USA'
 #google corrections
 dM$google$region[which(dM$google$region %in% 'Dominican Republic')] <- 'Dominican_R.'
 dM$google$region[which(dM$google$region %in% 'Saudi Arabia')] <- 'Saudi_Arabia'
+dM$google$region[which(dM$google$region %in% 'Costa Rica')] <- 'Costa_Rica'
 dM$google$region[which(dM$google$region %in% 'South Africa')]<- 'South_Africa'
 dM$google$region[which(dM$google$region %in% 'United Kingdom')] <- 'United_Kingdom'
 dM$google$region[which(dM$google$region %in% 'United States')] <- 'USA'
@@ -228,7 +229,7 @@ names(M$google) <- stream_google
 
 ```{r}
 M_process <- M
-f_d <- which(M[[1]][[1]]$dates %in% c('2020-02-17','2020-09-06'))
+f_d <- which(M[[1]][[1]]$dates %in% c('2020-02-17','2020-10-25'))
 
 for(i in 1:2){ # apple/google
   if(i==1){
@@ -300,9 +301,9 @@ M_process[['Combined']][['AG']] <- combine_mob(x = list(M_process$Combined$Apple
 # some plots
 
 ```{r}
-x_t_lab <- as.Date(c('01-01-2020','01-03-2020',
-                     '01-05-2020','01-07-2020',
-                     '01-09-2020'),format = '%d-%m-%Y')
+x_t_lab <- as.Date(c('01-02-2020','01-04-2020',
+                     '01-06-2020','01-08-2020',
+                     '01-10-2020'),format = '%d-%m-%Y')
 layout(matrix(1:6,3,2,byrow = FALSE))
 col1 <- c('red3','blue3','chartreuse4','cyan4','darkgoldenrod3','darkmagenta')
 d$dates <- as.Date(d$dates,format='%Y-%m-%d')
@@ -362,7 +363,8 @@ for(i in 2:ncol(d)){
     if((sum(!is.na(y))>0) & (c==1)){
       plot(d$dates,y,pch = 3, col=col1[k],cex=.2,
            main = 'Google',ylim = c(0,200),
-           xlab = '',ylab = y_la[n_colf+2],bty = 'n')
+           xlab = '',ylab = y_la[n_colf+2],bty = 'n',xaxt="n")
+      axis(side = 1,at = x_t_lab, labels = x_t_lab)
       lines(d$dates,y2, col=col1[k])
       abline(h = 100,lty = 3, col='grey')
       c <- 2
