@@ -25,7 +25,7 @@ opts_chunk$set(fig.path='figs/', fig.keep='high',
 
 ```{r}
 # source(file = '../inputProcessing/date_input.r')
-source(file = 'Rscript/niceplot_bestmodel.R')
+source(file = 'Rscript/niceplot_bestmodel_alt.R')
 
 
 
@@ -51,12 +51,25 @@ res_base <- readRDS(file =
 
 
 si <- 2
-for (Mdata in data_stream[12]){
+
+# alternatives
+country_alt <- c('Brazil', 'France', 'Italy',
+                 'Mexico', 'Philippines', 'Spain', 
+                 'United_Kingdom', 'USA')
+
+stream_alt <- rep("transit",length(country_alt))
+stream_alt[c(3,6)] <- c('walking','driving')
+
+stream_alt2 <- paste0(stream_alt,' (A)')
+
+
+# for (Mdata in data_stream[12]){
   # Mdata = data_stream[12]
-  fd.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/fig_BestModels/',Mdata)
+  fd.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/fig_BestModels/alt')
   dir.create(fd.name)
   
-  
+for(j in 1:length(country_alt)){
+  Mdata <- stream_alt[j]
   
   res_m <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/output_over_form_',Mdata,'.rds' ))[[si]]
   res_summary <- readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/output2_over_form_',Mdata,'.rds' ) )[[si]]
@@ -65,42 +78,42 @@ for (Mdata in data_stream[12]){
   res_summary2 <- readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/output2_over_form_',Mdata,'.rds' ) )[[si]]
   
   
-  n_country <- length(res_m$country)
+  # n_country <- length(res_m$country)
   country <- res_m$country
   
   country_initial <- names(inputs$D)[-1]
-  corr_across <- list(Robs =  res_base[[si]]$resEpi$median_R,
-                      Rpred = res_summary2$results_full_Rt_D2$median_R,
-                      Tc = res_summary2$results_full_Rt_D2$median_R)
-  corr_across$Tc[,2:(length(country)+1)] <- 1
-  
-  
-  for (i in 1:n_country){
-     mu_id = 18.8
+  # corr_across <- list(Robs =  res_base[[si]]$resEpi$median_R,
+  #                     Rpred = res_summary2$results_full_Rt_D2$median_R,
+  #                     Tc = res_summary2$results_full_Rt_D2$median_R)
+  # corr_across$Tc[,2:(length(country)+1)] <- 1
+  # 
+  i <- which(country %in% country_alt[j])
+  # for (i in 1:n_country){
+    mu_id = 18.8
     k <- which(country_initial %in% country[i])
     
-    Change <- as.numeric(round(res_m$resMCMC$DIC[i]) - round(res_m2$resMCMC$DIC[i]) > 10)
+    Change <- as.numeric(round(res_m$resMCMC$DIC[i]) - round(res_m2$resMCMC$DIC[i]) >= 0)
     
     niceplot(i, res_summary, res_base, inputs)
     
-    # f <- 1:nrow(res_base[[si]]$resEpi$S_below.5) #
-    # f <- f[which(res_base$resEpi$CV_below.2[,i+1])]
-    corr_across[[1]][,i+1] <- res_base[[si]]$resEpi$median_R[,i+1]
-    # f <- which(res_summary$results_full_Rt_D2$median_R[,i+1] != 0)
-    if (Change==0){
-      
-      corr_across[[2]][,i+1] <- res_summary$results_full_Rt_D2$median_R[,i+1]
-    }else{  
-      # second predictions
-      corr_across[[2]][,i+1] <- res_summary2$results_full_Rt_D2$median_R[,i+1]
-      mtc <- median(res_m2$resMCMC$theta[,4*length(country)+i]) + mu_id 
-      corr_across[[3]][round(mtc):nrow(corr_across[[2]]),i+1] <- 2
-      
-    }
+    # # f <- 1:nrow(res_base[[si]]$resEpi$S_below.5) #
+    # # f <- f[which(res_base$resEpi$CV_below.2[,i+1])]
+    # corr_across[[1]][,i+1] <- res_base[[si]]$resEpi$median_R[,i+1]
+    # # f <- which(res_summary$results_full_Rt_D2$median_R[,i+1] != 0)
+    # if (Change==0){
+    #   
+    #   corr_across[[2]][,i+1] <- res_summary$results_full_Rt_D2$median_R[,i+1]
+    # }else{  
+    #   # second predictions
+    #   corr_across[[2]][,i+1] <- res_summary2$results_full_Rt_D2$median_R[,i+1]
+    #   mtc <- median(res_m2$resMCMC$theta[,4*length(country)+i]) + mu_id 
+    #   corr_across[[3]][round(mtc):nrow(corr_across[[2]]),i+1] <- 2
+    #   
+    # }
     # plot(x,x2)
     
-  }
-  saveRDS(corr_across,file = paste0(Mdata,'_corr.rds'))
+  # }
+  # saveRDS(corr_across,file = paste0(Mdata,'_corr.rds'))
 }
 
 ```

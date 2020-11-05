@@ -1,5 +1,5 @@
 niceplot <- function(i,res_summary, res_base,inputs){
-  mu_id = 18.8
+ 
   fig.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/fig_2Models/',Mdata,'/',country[i],'.png')
   png(filename = fig.name, width = 9, height=6, units="in", res = 300)
 
@@ -106,8 +106,8 @@ niceplot <- function(i,res_summary, res_base,inputs){
   #epiestim
   f <- seq(4,nrow(res_base[[si]]$resEpi$S_below.5),by=7) 
   # f <- f[which(res_base[[si]]$resEpi$S_below.5[f,i+1])]
-  x1 <- 1-res_summary$results_meff$median_meff[f,i+1]-.5e-2
-  x2 <- 1-res_summary2$results_meff$median_meff[f,i+1]-.5e-2
+  x1 <- 1-res_summary$results_meff$median_meff[f,i+1]
+  x2 <- 1-res_summary2$results_meff$median_meff[f,i+1]
   # plot(x1,x2)
   x <- (x1+x2)/ 2
   y <- res_base[[si]]$resEpi$median_R[f,k+1]
@@ -196,8 +196,8 @@ niceplot <- function(i,res_summary, res_base,inputs){
   #epiestim see above
   f <- seq(4,nrow(res_base[[si]]$resEpi$S_below.5),by=7)
   # f <- f[which(res_base[[si]]$resEpi$S_below.5[f,i+1])]
-  x1 <- 1-res_summary$results_meff$median_meff[f,i+1]-.5e-2
-  x2 <- 1-res_summary2$results_meff$median_meff[f,i+1]-.5e-2
+  x1 <- 1-res_summary$results_meff$median_meff[f,i+1]
+  x2 <- 1-res_summary2$results_meff$median_meff[f,i+1]
   # plot(x1,x2)
   x <- (x1+x2)/ 2
   y <- res_base[[si]]$resEpi$median_R[f,k+1]
@@ -239,12 +239,12 @@ niceplot <- function(i,res_summary, res_base,inputs){
                                  # TeX('R_t within range of observed mobility'),
                                  TeX('R_t^{obs}'),
                                  TeX('R_t^{obs} associated with new Th')),
-           col = c(rgb(.1,.1,.1),rgb(.4,.5,.1,.2),rgb(.8,.3,0,.2),'black','red4'),lwd=2,bty='n')
+           col = c(rgb(.1,.1,.1),rgb(.4,.5,.1),rgb(.8,.3,0),'black','red4'),lwd=2,bty='n')
   # }
   
   
   # if(Mdata == 'A'){
-    mtext(paste0(country[i],' - ',
+    mtext(paste0(gsub('_',' ',country[i]),' - ',
                  round(res_m$resMCMC$DIC[i]),' - ',
                  round(res_m2$resMCMC$DIC[i]),' - ',
                  round(res_m$resMCMC$DIC[i])-round(res_m2$resMCMC$DIC[i])), 

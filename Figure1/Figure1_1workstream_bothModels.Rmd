@@ -36,7 +36,7 @@ source(file = 'Rscript/niceplot_bothmodel.R')
 
 
 ```{r}
-
+mu_id = 18.8
 inputs<- readRDS(file=
                    '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/inputs.rds')
 names(inputs)

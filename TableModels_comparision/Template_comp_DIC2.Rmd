@@ -60,34 +60,48 @@ for (i in 1:length(country_infer)){
   }
 }
 
-sum_Dic <- DICs3[,2:12] - DICs3[,13]
+sum_Dic <- DICs3[,13] - DICs3[,2:12]
 sum_Dic <- cbind(sum_Dic[,c(10,1,2,3)],NA,sum_Dic[,c(11,4,5,6,7,8,9)])
 names(sum_Dic) <- c('A','Driving (A)','Transit (A)','Walking (A)','',
                     'G','Grocery (G)','Park (G)','Resid. (G)','Retail (G)',
                     'Transit (G)','Work (G)')
+```
 
-boxplot(sum_Dic,las=2)
+```{r}
+boxplot(sum_Dic,las=2,ylim=c(-10,10))
 
+apply(sum_Dic,2,mean,na.rm=TRUE)
+
+```
+```{r,comp}
 # par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
-par(mar = c(5.5,4,2,1),bty = 'n')
+par(mar = c(5.5,5,2,1),bty = 'n')
 
 t_sum_Dic <- sum_Dic
 for(i in 1:ncol(sum_Dic)){
   t_sum_Dic[,i] <- sign(sum_Dic[,i]) * sqrt(sign(sum_Dic[,i])*sum_Dic[,i])
 }
-boxplot(t_sum_Dic,las=2,yaxt='n',ylab = 'DIC difference with A-G combined')
-abline(h=1,lwd=2,col = 'red3')
+boxplot(t_sum_Dic,las=2,yaxt='n',ylab = 'DIC difference \n(compared to A-G combined)')
+abline(h=0,lwd=2,col = 'red3')
+abline(h=sqrt(10),lwd=2,col = 'grey',lty=2)
+abline(h=-sqrt(10),lwd=2,col = 'grey',lty=2)
 
 at_y <- c(-100,-10,0,10,100)
 axis(side = 2,at = sign(at_y) * sqrt(at_y*sign(at_y)), labels = at_y)
 
+colSums(sum_Dic > (10),na.rm=TRUE)/colSums(!is.na(sum_Dic))
+colSums(!is.na(sum_Dic))/nrow(sum_Dic)
+
+```
+
+```{r}
 
 # only for those with changes
 par(mar = c(5.5,2,2,1),bty = 'n')
 
 
-boxplot(t_sum_Dic[f_change,],las=2,yaxt='n',ylab = 'DIC difference with A-G combined')
-abline(h=1,lwd=2,col = 'red3')
+boxplot(t_sum_Dic[f_change,],las=2,yaxt='n',ylab = 'DIC difference \newline(compared with A-G combined)')
+abline(h=0,lwd=2,col = 'red3')
 
 at_y <- c(-100,-10,0,10,100)
 axis(side = 2,at = sign(at_y) * sqrt(at_y*sign(at_y)), labels = at_y)
@@ -98,7 +112,7 @@ write.csv(x = DICs3,file = 'Best_tc_no_tc_AG.csv')
 # where substantial difference DIC_diff<-30
 subs_change <- c()
 for(i in 1:nrow(sum_Dic)){
-  f_20 <- which(sum_Dic[i,]< (-20))
+  f_20 <- which(sum_Dic[i,] > (20))
   if(length(f_20)>0){
     temp1 <- country_infer[i]
     temp2 <- paste0(sum_Dic[ i, f_20 ], collapse = ', ')
@@ -108,4 +122,10 @@ for(i in 1:nrow(sum_Dic)){
   
 }
 write.csv(x = subs_change,file = 'subs_change.csv')
+```
+Best among AG
+```{r}
+
+
+
 ```

@@ -1,6 +1,6 @@
 niceplot <- function(i,res_summary, res_base,inputs){
   mu_id = 18.8
-  fig.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/fig_BestModels/',Mdata,'/',country[i],'.png')
+  fig.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/fig_BestModels/alt/',Mdata,'_',country[i],'.png')
   png(filename = fig.name, width = 9, height=6, units="in", res = 300)
 
   xlim <- c(as.Date('15-02-2020',format='%d-%m-%Y'),range(inputs$D$dates)[2])
@@ -283,7 +283,7 @@ niceplot <- function(i,res_summary, res_base,inputs){
    #              round(res_m2$resMCMC$DIC[i]),' - ',
    #              round(res_m$resMCMC$DIC[i])-round(res_m2$resMCMC$DIC[i])), 
    #       side = 3,  line = 1.5, outer = FALSE,adj = -.15,font=2)
-   mtext(gsub('_',' ',country[i]), 
+   mtext(paste0(gsub('_',' ',country[i]),'; ',stream_alt2[j]), 
          side = 3,  line = 1.5, outer = FALSE,adj = -.15,font=2)
    # }else{
     # mtext(paste0(country[i],' (Google)'), side = 3,  line = 1.5, outer = FALSE,adj = -.15,font=2)
