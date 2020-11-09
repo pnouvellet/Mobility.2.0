@@ -53,7 +53,7 @@ for (Mdata in data_stream[12]){
   
   
   # for (si in 2){
-  si=2
+  si=1
   rep <- 1e5
   ########################################
   ####inputs

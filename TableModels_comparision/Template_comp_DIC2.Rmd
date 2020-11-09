@@ -84,7 +84,7 @@ for(i in 1:ncol(sum_Dic)){
 boxplot(t_sum_Dic,las=2,yaxt='n',ylab = 'DIC difference \n(compared to A-G combined)')
 abline(h=0,lwd=2,col = 'red3')
 abline(h=sqrt(10),lwd=2,col = 'grey',lty=2)
-abline(h=-sqrt(10),lwd=2,col = 'grey',lty=2)
+# abline(h=-sqrt(10),lwd=2,col = 'grey',lty=2)
 
 at_y <- c(-100,-10,0,10,100)
 axis(side = 2,at = sign(at_y) * sqrt(at_y*sign(at_y)), labels = at_y)
@@ -122,10 +122,4 @@ for(i in 1:nrow(sum_Dic)){
   
 }
 write.csv(x = subs_change,file = 'subs_change.csv')
-```
-Best among AG
-```{r}
-
-
-
 ```

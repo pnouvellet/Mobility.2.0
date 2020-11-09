@@ -13,7 +13,7 @@ library(latex2exp)
 
 opts_chunk$set(collapse = TRUE)
 
-opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/TableModels_comparision/figs/',
+opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/TableModels_comparision/si1/',
                fig.keep='high', 
                dev=c('png'), fig.width=6, fig.height=6, cache=FALSE,
                tidy=FALSE, warning=FALSE, fig.show="asis"

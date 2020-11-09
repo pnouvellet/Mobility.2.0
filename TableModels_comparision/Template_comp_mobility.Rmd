@@ -1,0 +1,80 @@
+---
+title: "R0Beta"
+author: "Pierre Nouvellet"
+date: "2019-07"
+---
+
+```{r , include = FALSE, message = FALSE, warning = FALSE, error = FALSE}
+library(knitr)
+library(Hmisc)
+library(EpiEstim)
+library(zoo)
+library(latex2exp)
+
+opts_chunk$set(collapse = TRUE)
+
+opts_chunk$set(fig.path='../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/TableModels_comparision/', fig.keep='high', 
+               dev=c('png'), fig.width=9, fig.height=6, cache=FALSE,
+               tidy=FALSE, warning=FALSE, fig.show="asis"
+)
+
+```
+
+# input data
+
+
+```{r}
+
+
+inputs<- readRDS(file=
+                   '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/inputs.rds')
+names(inputs)
+data_stream <- names(inputs$M_process_mat )
+
+M <-(inputs$M_process_mat$AG)
+
+M_sum <- apply(M,1,quantile,c(0.5,.025,.975),na.rm=TRUE)
+x <- inputs$M$apple$driving$dates
+x <- as.Date(x,format = '%Y-%m-%d')
+```
+
+```{r}
+xlim <- c(as.Date('15-02-2020',format='%d-%m-%Y'),range(inputs$D$dates)[2])
+plot(x,M_sum[1,]/100,type = 'l',bty='n',
+     ylim = c(0,150)/100,xlim = xlim,xlab = '',ylab = 'prop. mobility')
+polygon(c(x,rev(x)),c(M_sum[2,],rev(M_sum[3,]))/100,border = NA,col = rgb(.1,.1,.1,.2))
+
+legend('topleft',legend = c('median','95 percentile across countries'),
+       lwd = c(2,5),col = c(rgb(.1,.1,.1),rgb(.1,.1,.1,.2)),bty='n',cex=.8)
+
+f <- which(M_sum[1,] %in% min(M_sum[1,],na.rm=TRUE))
+x[f]
+M_sum[,f]
+
+M_sum[,290:294]
+
+## with minimum to maximum drop
+sort(apply(M,2,min,na.rm=TRUE))
+sort(apply(M,2,min,na.rm=TRUE),decreasing = TRUE)[1:10]
+sort(apply(M,2,min,na.rm=TRUE),decreasing = FALSE)[1:10]
+
+```
+
+```{r}
+# data_stream
+data_stream2 <- c("driving","transit", "walking", 
+                  "grocery and pharmacy", "parks", "residential",
+                  "retail and recreation", "transit stations" , "workplaces", 
+                  "Apple combined" ,  "Google combined")
+layout(matrix(1:12,3,4,byrow = TRUE))
+
+# par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
+par(mar = c(4,4,.5,0.5))
+for(i in 1:11){
+  matplot(inputs$M_process_mat$AG,inputs$M_process_mat[[i]],pch='.',bty='n',
+          xlab= '',ylab = data_stream2[i],
+          xlim = c(-0,400),ylim = c(-0,400),cex.lab=1.5)
+  lines(c(-200,400),c(-200,400),lwd=2)
+}
+mtext(side = 1, text = 'Apple-Google combined mobility',adj = 1.7,cex=1.1,padj = 2.4)
+```
