@@ -37,11 +37,11 @@ names(DICs1)[-1] <- data_stream
 DICs2 <- DICs1
 names(DICs2)[-1] <- paste0(data_stream,'_tc')
                            
-si=2
-for (Mdata in data_stream){
+si=1
+for (Mdata in data_stream[12]){
   
-  res_m1 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/output_over_form_',Mdata,'.rds' ))[[si]]
-  res_m2 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/output_over_form_',Mdata,'.rds' ))[[si]]
+  res_m1 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/si1/output_over_form_',Mdata,'.rds' ))[[si]]
+  res_m2 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/si1/output_over_form_',Mdata,'.rds' ))[[si]]
   
   country_infer <- (res_m1$country)
   for (i in 1:length(country_infer)){
@@ -69,10 +69,7 @@ for (i in 1:nrow(DICs4)){
 }
 DICs4[,6] <- DICs4[,3]-DICs4[,5]
 
-write.csv(DICs1,file = 'DICs1.csv')
-write.csv(DICs2,file = 'DICs2.csv')
-write.csv(DICs3,file = 'DICs3.csv')
-write.csv(DICs4,file = 'DICs4.csv')
+
 ```
 
 
@@ -84,13 +81,22 @@ AG$diff <- AG$AG-AG$AGt
 AG$Tc <- AG$diff>10
 
 ## WHO region
-write.csv(AG,'AG.csv')
+write.csv(AG,'AG_si1.csv')
 
-AG <- read.csv(file = 'AG_with_region.csv')
+AG <- read.csv(file = 'AG_with_region_si1.csv')
 AG[,2] <- as.character(AG[,2])
 AG[,3] <- as.character(AG[,3])
 AG[,4] <- as.character(AG[,4])
 
+
+AG0 <- readRDS(file = 'AG.rds')
+AG0[,2] <- as.character(AG0[,2])
+AG0[,3] <- as.character(AG0[,3])
+AG0[,4] <- as.character(AG0[,4])
+
+# plot(AG$diff,AG0$diff)
+m <- lm(AG$diff~AG0$diff)
+summary(m)
 
 ```
 
@@ -103,7 +109,7 @@ betas1 <- apply(res_m1$resMCMC$theta[,N_geo+(1:N_geo)],2,quantile,c(.5,.025,.975
 betas2_1 <- apply(res_m2$resMCMC$theta[,N_geo+(1:N_geo)],2,quantile,c(.5,.025,.975))
 betas2_2 <- apply(res_m2$resMCMC$theta[,3*N_geo+(1:N_geo)],2,quantile,c(.5,.025,.975))
 
-AGcorr <- readRDS('../Figure1/AG_corr.rds')
+AGcorr <- readRDS('../Figure1/AG_corr_si1.rds')
 AG$Rsq <- NA
 
 AG$Rsq1 <- NA
@@ -121,9 +127,9 @@ for (i in 1:nrow(AG)){
   m <- summary(lm(y~x))
   AG$Rsq[i] <- m$adj.r.squared
   
-  plot(x,y,main = paste0(AG$country[i],' - ', round(AG$Rsq[i],digits = 2)))
+  # plot(x,y,main = paste0(AG$country[i],' - ', round(AG$Rsq[i],digits = 2)))
   
-  if(AG$diff[i]>10){
+  if(AG0$diff[i]>10){
     f <- which( AGcorr[[3]][,i+1] ==1)
     m1 <- summary(lm(y[f]~x[f]))
     AG$Rsq1[i] <- m1$adj.r.squared
@@ -142,7 +148,7 @@ for (i in 1:nrow(AG)){
 
 xt <-  as.vector(as.matrix(AGcorr[[1]][,-1]))
 yt <- as.vector(as.matrix(AGcorr[[2]][,-1]))
-plot(xt,yt)
+# plot(xt,yt)
 m <- summary(lm(yt~xt))
 m
 ```
@@ -167,16 +173,16 @@ names(t2_d) <- c('region','noTC','Tc')
 sum_tc <- binconf(x=t2$Tc,n = t2$noTC+t2$Tc,method = 'exact')
 sum_tc_d <- binconf(x=t2_d$Tc,n = t2_d$noTC+t2_d$Tc,method = 'exact')
 
-errbar(x = 1:4,y = sum_tc[,1],yplus = sum_tc[,2],yminus = sum_tc[,3],
-       xaxt='n',bty='n',ylab = 'proportion with time change',col='blue3',errbar.col = 'blue3',
-       xlab = '',xlim = c(0.8,4.5),ylim = c(0,1))
-errbar(x = 1:4+.3,y = sum_tc_d[,1],yplus = sum_tc_d[,2],yminus = sum_tc_d[,3],
-       xaxt='n',bty='n',ylab = '',col='red3',errbar.col = 'red3',
-       xlab = '',xlim = c(0.8,4.5),ylim = c(0,1),add=TRUE)
-axis(side = 1,at = 1:4,labels = t2$region)
-
-legend('bottomright',legend = c('across all','where >5,000 deaths'),bty='n',
-       lwd=2,col=c('blue3','red3'),seg.len = .5,cex=.7)
+# errbar(x = 1:4,y = sum_tc[,1],yplus = sum_tc[,2],yminus = sum_tc[,3],
+#        xaxt='n',bty='n',ylab = 'proportion with time change',col='blue3',errbar.col = 'blue3',
+#        xlab = '',xlim = c(0.8,4.5),ylim = c(0,1))
+# errbar(x = 1:4+.3,y = sum_tc_d[,1],yplus = sum_tc_d[,2],yminus = sum_tc_d[,3],
+#        xaxt='n',bty='n',ylab = '',col='red3',errbar.col = 'red3',
+#        xlab = '',xlim = c(0.8,4.5),ylim = c(0,1),add=TRUE)
+# axis(side = 1,at = 1:4,labels = t2$region)
+# 
+# legend('bottomright',legend = c('across all','where >5,000 deaths'),bty='n',
+#        lwd=2,col=c('blue3','red3'),seg.len = .5,cex=.7)
 
 
 # binconf(x=sum(t2$Tc),n = sum(t2$noTC+t2$Tc),method = 'exact')
@@ -210,36 +216,36 @@ t3_d <-aggregate(AG$Rsq[f_d],by=list(AG$region2[f_d]),quantile,c(.5,.025,.975))
 t3_d <- data.frame(t3_d[[1]],t3_d[[2]][,1],t3_d[[2]][,2],t3_d[[2]][,3])
 names(t3_d) <- c('region','med','low','up')
 
-
-
-errbar(x = 1:4,y = t3[,2],yplus = t3[,3],yminus = t3[,4],
-       xaxt='n',bty='n',ylab = 'R-square (adj.)',
-       xlab = '',xlim = c(0.8,4.5),ylim = c(0,1))
-
-errbar(x = 1:4+.2,y = t3_tc[,2],yplus = t3_tc[,3],yminus = t3_tc[,4],
-       xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'blue3',errbar.col = 'blue3',
-       xlab = '',xlim = c(0.5,4.5),ylim = c(0,1),add=TRUE)
-
-errbar(x = 1:4+.4,y = t3_d[,2],yplus = t3_d[,3],yminus = t3_d[,4],
-       xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'red3',errbar.col = 'red3',
-       xlab = '',xlim = c(0.5,4.5),ylim = c(0,1),add=TRUE)
-axis(side = 1,at = 1:4,labels = t3$region)
-
-legend('bottomright',legend = c('all','with time change','and >5,000 deaths'),bty='n',
-       lwd=2,col=c('black','blue3','red3'),seg.len = .5,cex=.7)
+# 
+# 
+# errbar(x = 1:4,y = t3[,2],yplus = t3[,3],yminus = t3[,4],
+#        xaxt='n',bty='n',ylab = 'R-square (adj.)',
+#        xlab = '',xlim = c(0.8,4.5),ylim = c(0,1))
+# 
+# errbar(x = 1:4+.2,y = t3_tc[,2],yplus = t3_tc[,3],yminus = t3_tc[,4],
+#        xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'blue3',errbar.col = 'blue3',
+#        xlab = '',xlim = c(0.5,4.5),ylim = c(0,1),add=TRUE)
+# 
+# errbar(x = 1:4+.4,y = t3_d[,2],yplus = t3_d[,3],yminus = t3_d[,4],
+#        xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'red3',errbar.col = 'red3',
+#        xlab = '',xlim = c(0.5,4.5),ylim = c(0,1),add=TRUE)
+# axis(side = 1,at = 1:4,labels = t3$region)
+# 
+# legend('bottomright',legend = c('all','with time change','and >5,000 deaths'),bty='n',
+#        lwd=2,col=c('black','blue3','red3'),seg.len = .5,cex=.7)
 
 quantile(AG$Rsq,c(.5,.025,.975))
-hist(AG$Rsq)
+# hist(AG$Rsq)
 
 # only with TC
 
 quantile(AG$Rsq[f_tc],c(.5,.025,.975))
-hist(AG$Rsq[f_tc])
+# hist(AG$Rsq[f_tc])
 
 # with more deaths
 
 quantile(AG$Rsq[f_d],c(.5,.025,.975))
-hist(AG$Rsq[f_d])
+# hist(AG$Rsq[f_d])
 ```
 
 check  cuntry Rsq  in regions vs 1st second time
@@ -258,22 +264,22 @@ t4_d <- data.frame(t4_d[[1]],t4_d[[2]][,1],t4_d[[2]][,2],t4_d[[2]][,3])
 names(t4_d) <- c('region','med','low','up')
 
 
-
-errbar(x = 1:4,y = t4[,2],yplus = t4[,3],yminus = t4[,4],
-       xaxt='n',bty='n',ylab = 'R-square (adj.)',
-       xlab = '',xlim = c(0.8,4.5),ylim = c(0,1))
-
-errbar(x = 1:4+.2,y = t4_tc[,2],yplus = t4_tc[,3],yminus = t4_tc[,4],
-       xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'blue3',errbar.col = 'blue3',
-       xlab = '',xlim = c(0.5,4.5),ylim = c(0,1),add=TRUE)
-
-errbar(x = 1:4+.4,y = t4_d[,2],yplus = t4_d[,3],yminus = t4_d[,4],
-       xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'red3',errbar.col = 'red3',
-       xlab = '',xlim = c(0.5,4.5),ylim = c(0,1),add=TRUE)
-axis(side = 1,at = 1:4,labels = t4$region)
-
-legend('bottomright',legend = c('all','pre-dampening','post-dampening'),bty='n',
-       lwd=2,col=c('black','blue3','red3'),seg.len = .5,cex=.7)
+# 
+# errbar(x = 1:4,y = t4[,2],yplus = t4[,3],yminus = t4[,4],
+#        xaxt='n',bty='n',ylab = 'R-square (adj.)',
+#        xlab = '',xlim = c(0.8,4.5),ylim = c(0,1))
+# 
+# errbar(x = 1:4+.2,y = t4_tc[,2],yplus = t4_tc[,3],yminus = t4_tc[,4],
+#        xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'blue3',errbar.col = 'blue3',
+#        xlab = '',xlim = c(0.5,4.5),ylim = c(0,1),add=TRUE)
+# 
+# errbar(x = 1:4+.4,y = t4_d[,2],yplus = t4_d[,3],yminus = t4_d[,4],
+#        xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'red3',errbar.col = 'red3',
+#        xlab = '',xlim = c(0.5,4.5),ylim = c(0,1),add=TRUE)
+# axis(side = 1,at = 1:4,labels = t4$region)
+# 
+# legend('bottomright',legend = c('all','pre-dampening','post-dampening'),bty='n',
+#        lwd=2,col=c('black','blue3','red3'),seg.len = .5,cex=.7)
 
 # quantile(AG$Rsq,c(.5,.025,.975))
 # hist(AG$Rsq)
@@ -291,71 +297,71 @@ legend('bottomright',legend = c('all','pre-dampening','post-dampening'),bty='n',
 
 
 combine both previous figure
-```{r,perf}
+```{r,perf_si1}
 
-
-
-layout(matrix(1:3,3,1))
-
-
-##################################
-# par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
-par(mar = c(2,4,0,2))
-
-errbar(x = 1:4-.1,y = sum_tc[,1],yplus = sum_tc[,2],yminus = sum_tc[,3],
-       xaxt='n',bty='n',ylab = 'p. with time change',col='blue3',errbar.col = 'blue3',
-       xlab = '',xlim = c(0.8,5),ylim = c(0,1))
-errbar(x = 1:4+.1,y = sum_tc_d[,1],yplus = sum_tc_d[,2],yminus = sum_tc_d[,3],
-       xaxt='n',bty='n',ylab = '',col='red3',errbar.col = 'red3',
-       xlab = '',ylim = c(0,1),add=TRUE)
-axis(side = 1,at = 1:4,labels =rep('',4),las=2)
-
-legend('bottomright',legend = c('across all','where >5,000 deaths'),bty='n',
-       lwd=2,col=c('blue3','red3'),seg.len = .5,cex=.85)
-
-
-##################################
-# par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
-par(mar = c(2,4,0,2))
-
-
-errbar(x = 1:4-.1,y = t3[,2],yplus = t3[,3],yminus = t3[,4],
-       xaxt='n',bty='n',ylab = 'R-square (adj.)',
-       xlab = '',xlim = c(0.8,5),ylim = c(0,1))
-
-errbar(x = 1:4,y = t3_tc[,2],yplus = t3_tc[,3],yminus = t3_tc[,4],
-       xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'blue3',errbar.col = 'blue3',
-       xlab = '',ylim = c(0,1),add=TRUE)
-
-errbar(x = 1:4+.1,y = t3_d[,2],yplus = t3_d[,3],yminus = t3_d[,4],
-       xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'red3',errbar.col = 'red3',
-       xlab = '',ylim = c(0,1),add=TRUE)
-axis(side = 1,at = 1:4,labels = rep('',4),las=2)
-
-legend('bottomright',legend = c('all','with time change','and >5,000 deaths'),bty='n',
-       lwd=2,col=c('black','blue3','red3'),seg.len = .5,cex=.85)
-
-
-##################################
-# par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
-par(mar = c(2,4,0,2))
-
-errbar(x = 1:4-.1,y = t4[,2],yplus = t4[,3],yminus = t4[,4],
-       xaxt='n',bty='n',ylab = 'R-square (adj.)',
-       xlab = '',xlim = c(0.8,5),ylim = c(0,1))
-
-errbar(x = 1:4,y = t4_tc[,2],yplus = t4_tc[,3],yminus = t4_tc[,4],
-       xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'blue3',errbar.col = 'blue3',
-       xlab = '',ylim = c(0,1),add=TRUE)
-
-errbar(x = 1:4+.1,y = t4_d[,2],yplus = t4_d[,3],yminus = t4_d[,4],
-       xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'red3',errbar.col = 'red3',
-       xlab = '',ylim = c(0,1),add=TRUE)
-axis(side = 1,at = 1:4,labels = t4$region)
-
-legend('bottomright',legend = c('all','pre-dampening','post-dampening'),bty='n',
-       lwd=2,col=c('black','blue3','red3'),seg.len = .5,cex=.85)
-
+# 
+# 
+# layout(matrix(1:3,3,1))
+# 
+# 
+# ##################################
+# # par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
+# par(mar = c(2,4,0,2))
+# 
+# errbar(x = 1:4-.1,y = sum_tc[,1],yplus = sum_tc[,2],yminus = sum_tc[,3],
+#        xaxt='n',bty='n',ylab = 'p. with time change',col='blue3',errbar.col = 'blue3',
+#        xlab = '',xlim = c(0.8,5),ylim = c(0,1))
+# errbar(x = 1:4+.1,y = sum_tc_d[,1],yplus = sum_tc_d[,2],yminus = sum_tc_d[,3],
+#        xaxt='n',bty='n',ylab = '',col='red3',errbar.col = 'red3',
+#        xlab = '',ylim = c(0,1),add=TRUE)
+# axis(side = 1,at = 1:4,labels =rep('',4),las=2)
+# 
+# legend('bottomright',legend = c('across all','where >5,000 deaths'),bty='n',
+#        lwd=2,col=c('blue3','red3'),seg.len = .5,cex=.85)
+# 
+# 
+# ##################################
+# # par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
+# par(mar = c(2,4,0,2))
+# 
+# 
+# errbar(x = 1:4-.1,y = t3[,2],yplus = t3[,3],yminus = t3[,4],
+#        xaxt='n',bty='n',ylab = 'R-square (adj.)',
+#        xlab = '',xlim = c(0.8,5),ylim = c(0,1))
+# 
+# errbar(x = 1:4,y = t3_tc[,2],yplus = t3_tc[,3],yminus = t3_tc[,4],
+#        xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'blue3',errbar.col = 'blue3',
+#        xlab = '',ylim = c(0,1),add=TRUE)
+# 
+# errbar(x = 1:4+.1,y = t3_d[,2],yplus = t3_d[,3],yminus = t3_d[,4],
+#        xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'red3',errbar.col = 'red3',
+#        xlab = '',ylim = c(0,1),add=TRUE)
+# axis(side = 1,at = 1:4,labels = rep('',4),las=2)
+# 
+# legend('bottomright',legend = c('all','with time change','and >5,000 deaths'),bty='n',
+#        lwd=2,col=c('black','blue3','red3'),seg.len = .5,cex=.85)
+# 
+# 
+# ##################################
+# # par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
+# par(mar = c(2,4,0,2))
+# 
+# errbar(x = 1:4-.1,y = t4[,2],yplus = t4[,3],yminus = t4[,4],
+#        xaxt='n',bty='n',ylab = 'R-square (adj.)',
+#        xlab = '',xlim = c(0.8,5),ylim = c(0,1))
+# 
+# errbar(x = 1:4,y = t4_tc[,2],yplus = t4_tc[,3],yminus = t4_tc[,4],
+#        xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'blue3',errbar.col = 'blue3',
+#        xlab = '',ylim = c(0,1),add=TRUE)
+# 
+# errbar(x = 1:4+.1,y = t4_d[,2],yplus = t4_d[,3],yminus = t4_d[,4],
+#        xaxt='n',bty='n',ylab = 'R-square (adj.)',col = 'red3',errbar.col = 'red3',
+#        xlab = '',ylim = c(0,1),add=TRUE)
+# axis(side = 1,at = 1:4,labels = t4$region)
+# 
+# legend('bottomright',legend = c('all','pre-dampening','post-dampening'),bty='n',
+#        lwd=2,col=c('black','blue3','red3'),seg.len = .5,cex=.85)
+# 
 
 
 
@@ -371,12 +377,12 @@ AG[,c('th1','th1low','th1up')] <-NA
 AG[,c('th2','th2low','th2up')] <-NA
 
 Mdata <- "AG"
-res_m1 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/output_over_form_',Mdata,'.rds' ))[[si]]
-res_m1b <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/Rdata/output2_over_form_',Mdata,'.rds' ))[[si]]
+res_m1 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/si1/output_over_form_',Mdata,'.rds' ))[[si]]
+res_m1b <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/si1/output2_over_form_',Mdata,'.rds' ))[[si]]
 
 
-res_m2 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/output_over_form_',Mdata,'.rds' ))[[si]]
-res_m2b <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/Rdata/output2_over_form_',Mdata,'.rds' ))[[si]]
+res_m2 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/si1/output_over_form_',Mdata,'.rds' ))[[si]]
+res_m2b <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/si1/output2_over_form_',Mdata,'.rds' ))[[si]]
 f <-rep(NA,3)  
 for(i in 1:nrow(AG)){
   if(AG$Tc[i]){
@@ -448,7 +454,7 @@ for(i in 1:nrow(AG)){
 ```
 
 
-```{r,Thresholds,fig.height=10,fig.width=8}
+```{r,Thresholds_si1,fig.height=10,fig.width=8}
 bound <- function(x){
   if(is.numeric(x[1])){
     if(is.na(x[2])) x[2] <- -2
@@ -532,7 +538,7 @@ c(tail(res_m2b$results_full_Rt_D2$median_R$United_Kingdom,1),
 
 # categories
 
-```{r,freq,fig.height=4,fig.width=6}
+```{r,freq_si1,fig.height=4,fig.width=6}
 # par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
 par(mar = c(5,4,2,0))
 
@@ -592,16 +598,16 @@ quantile(c(AG$Rsq1[AG$Tc==1 & AG$TotalDeath>5e3]),c(.5,.025,.975),na.rm=TRUE)
 
 #################
 
-quantile(AG$Rsq1[which(AG$beta1==1)],c(.5,.025,.975))
+# quantile(AG$Rsq1[which(AG$beta1==1)],c(.5,.025,.975))
 
-sum(AG$beta1==1)/nrow(AG)
-quantile(AG$Rsq1[which(AG$beta1==1)],c(.5,.025,.975))
-quantile(AG$Rsq1[which(AG$beta1==1 & AG$TotalDeath>5e3)],c(.5,.025,.975))
-
-##########################
-sum(AG$beta2==1,na.rm=TRUE)/sum(!is.na(AG$beta2))
-quantile(AG$Rsq2[which(AG$beta2==1)],c(.5,.025,.975))
-quantile(AG$Rsq2[which(AG$beta2==1 & AG$TotalDeath>5e3)],c(.5,.025,.975))
+# sum(AG$beta1==1)/nrow(AG)
+# # quantile(AG$Rsq1[which(AG$beta1==1)],c(.5,.025,.975))
+# # quantile(AG$Rsq1[which(AG$beta1==1 & AG$TotalDeath>5e3)],c(.5,.025,.975))
+# 
+# ##########################
+# sum(AG$beta2==1,na.rm=TRUE)/sum(!is.na(AG$beta2))
+# quantile(AG$Rsq2[which(AG$beta2==1)],c(.5,.025,.975))
+# quantile(AG$Rsq2[which(AG$beta2==1 & AG$TotalDeath>5e3)],c(.5,.025,.975))
 
 ```
 
@@ -633,7 +639,7 @@ Tab_SI$Threshold_1 <- as.character(Tab_SI$Threshold_1)
 Tab_SI$Threshold_2 <- as.character(Tab_SI$Threshold_2)
 
 for (i in 1:nrow(AG)){
-  if (AG$Tc[i] == 1){
+  if (AG0$Tc[i] == 1){
     temp <- quantile(res_m2$resMCMC$theta[,i],c(.5,.025,.975))
     Tab_SI$R0_1[i] <- paste0(round(temp[1],digits = 2),' ; 95%CrI [',
                           round(temp[2],digits = 2),' ; ',
@@ -687,6 +693,9 @@ for (i in 1:nrow(AG)){
   
 }
 
-write.csv(Tab_SI,file = 'table_SI.csv')
+write.csv(Tab_SI,file = 'table_SI_si1.csv')
+t2 <- read.csv('table_SI.csv')
+
+
 
 ```

@@ -1,18 +1,10 @@
 niceplot <- function(i,res_summary, res_base,inputs){
   mu_id = 18.8
-  
-  
-  fig.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/fig_BestModels/',Mdata,'/',country[i],'.png')
+  fig.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/fig_BestModels/si1',Mdata,'/',country[i],'.png')
   png(filename = fig.name, width = 9, height=6, units="in", res = 300)
 
-  par(cex.axis = 1.5, cex.lab  = 1.5)
-  
   xlim <- c(as.Date('15-02-2020',format='%d-%m-%Y'),range(inputs$D$dates)[2])
   layout(matrix(c(1,1,3,3,3,2,2,3,3,3),2,5,byrow = TRUE))
-  
-  # par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
-  par(mar = c(5,5.5,3,1))
-  
   # plot mobility
   plot(inputs$D$dates,inputs$M_process_mat[[Mdata]][,k]/100,#main = country[i],
        xlim = xlim,
@@ -24,14 +16,10 @@ niceplot <- function(i,res_summary, res_base,inputs){
   mtext('a)', side = 3, line = 1.5, adj = -.15, cex = 1)
   
   # plot Rt
-  
-  # par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
-  par(mar = c(5,5.5,3,1))
-  
-  f <- 1:nrow(res_base[[si]]$resEpi$S_below.5) #
+  f <- 1:nrow(res_base[[2]]$resEpi$S_below.5) #
   # f <- f[which(res_base$resEpi$CV_below.2[,i+1])]
-  x <- res_base[[si]]$resEpi$median_R$dates[f] # (epi_res$t_end2 )[f]
-  plot(x,res_base[[si]]$resEpi$median_R[f,k+1],
+  x <- res_base[[2]]$resEpi$median_R$dates[f] # (epi_res$t_end2 )[f]
+  plot(x,res_base[[2]]$resEpi$median_R[f,k+1],
        xlim=xlim,
        ylim = c(0,5),
        type = 'l',col='black',lwd=2,bty = 'n',
@@ -41,7 +29,7 @@ niceplot <- function(i,res_summary, res_base,inputs){
   
   
   polygon(c(x,rev(x)),
-          c(res_base[[si]]$resEpi$low_R[f,k+1],rev(res_base[[si]]$resEpi$up_R[f,k+1])), 
+          c(res_base[[2]]$resEpi$low_R[f,k+1],rev(res_base[[2]]$resEpi$up_R[f,k+1])), 
           col = rgb(0,0,0,.2), border = FALSE )
   abline(h=(1),lwd=2,col='darkolivegreen4',lty=2)
   
@@ -106,11 +94,11 @@ niceplot <- function(i,res_summary, res_base,inputs){
   }
   if (Change ==0){
     legend('topright',legend = c(TeX('R_t^{D}'),TeX('R_t'),TeX('R_t^{obs}')),
-           col = c(rgb(0,0,1),rgb(1,0,0),rgb(0,0,0)),lwd=2,bty='n',seg.len = .5,cex=1.5)
+           col = c(rgb(0,0,1),rgb(1,0,0),rgb(0,0,0)),lwd=2,bty='n',seg.len = .5)
   }else{
     legend('topright',legend = c(TeX('R_t^{D}'),TeX('R_t'),TeX('R_t^{obs}'),TeX('t_{change}')),
            col = c(rgb(0,0,1),rgb(1,0,0),rgb(0,0,0),'darkorange'),lwd=2,
-           pch = c(rep(NA,3),16),bty='n',seg.len = .5,cex=1.5)
+           pch = c(rep(NA,3),16),bty='n',seg.len = .5)
   }
   
   
@@ -118,20 +106,19 @@ niceplot <- function(i,res_summary, res_base,inputs){
   # plot Rt vs mob
  ###################################
   #epiestim
-  # par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
-  par(mar = c(5,5.5,3,.5))
+ 
   ##################################
   
   if (Change == 0){
-    f <- seq(4,nrow(res_base[[si]]$resEpi$S_below.5),by=7) 
-    # f <- f[which(res_base[[si]]$resEpi$S_below.5[f,i+1])]
+    f <- seq(4,nrow(res_base[[2]]$resEpi$S_below.5),by=7) 
+    # f <- f[which(res_base[[2]]$resEpi$S_below.5[f,i+1])]
     x <- 1-res_summary$results_meff$median_meff[f,i+1]
     # x2 <- 1-res_summary2$results_meff$median_meff[f,i+1]-.5e-2
     # plot(x1,x2)
     # x <- (x1+x2)/ 2
-    y <- res_base[[si]]$resEpi$median_R[f,k+1]
-    yplus <- res_base[[si]]$resEpi$up_R[f,k+1]
-    yminus <- res_base[[si]]$resEpi$low_R[f,k+1]
+    y <- res_base[[2]]$resEpi$median_R[f,k+1]
+    yplus <- res_base[[2]]$resEpi$up_R[f,k+1]
+    yminus <- res_base[[2]]$resEpi$low_R[f,k+1]
     n_est <- length(x)
     ##################
     f <- which(inputs$D[,k+1] > 0)
@@ -158,15 +145,15 @@ niceplot <- function(i,res_summary, res_base,inputs){
   }
   
   if (Change == 1){
-    f <- seq(4,nrow(res_base[[si]]$resEpi$S_below.5),by=7) 
-    # f <- f[which(res_base[[si]]$resEpi$S_below.5[f,i+1])]
+    f <- seq(4,nrow(res_base[[2]]$resEpi$S_below.5),by=7) 
+    # f <- f[which(res_base[[2]]$resEpi$S_below.5[f,i+1])]
     # x1 <- 1-res_summary$results_meff$median_meff[f,i+1]-.5e-2
     x <- 1-res_summary2$results_meff$median_meff[f,i+1]
     # plot(x1,x2)
     # x <- (x1+x2)/ 2
-    y <- res_base[[si]]$resEpi$median_R[f,k+1]
-    yplus <- res_base[[si]]$resEpi$up_R[f,k+1]
-    yminus <- res_base[[si]]$resEpi$low_R[f,k+1]
+    y <- res_base[[2]]$resEpi$median_R[f,k+1]
+    yplus <- res_base[[2]]$resEpi$up_R[f,k+1]
+    yminus <- res_base[[2]]$resEpi$low_R[f,k+1]
     n_est <- length(x)
     ##################
     f <- which(inputs$D[,k+1] > 0)
@@ -224,15 +211,15 @@ niceplot <- function(i,res_summary, res_base,inputs){
   #         col=rgb(1,0,1,.2),border=NA)
   
   #epiestim see above
-  f <- seq(4,nrow(res_base[[si]]$resEpi$S_below.5),by=7)
-  # f <- f[which(res_base[[si]]$resEpi$S_below.5[f,i+1])]
+  f <- seq(4,nrow(res_base[[2]]$resEpi$S_below.5),by=7)
+  # f <- f[which(res_base[[2]]$resEpi$S_below.5[f,i+1])]
   # x1 <- 1-res_summary$results_meff$median_meff[f,i+1]-.5e-2
   # x2 <- 1-res_summary2$results_meff$median_meff[f,i+1]-.5e-2
   # # plot(x1,x2)
   # x <- (x1+x2)/ 2
-  y <- res_base[[si]]$resEpi$median_R[f,k+1]
-  yplus <- res_base[[si]]$resEpi$up_R[f,k+1]
-  yminus <- res_base[[si]]$resEpi$low_R[f,k+1]
+  y <- res_base[[2]]$resEpi$median_R[f,k+1]
+  yplus <- res_base[[2]]$resEpi$up_R[f,k+1]
+  yminus <- res_base[[2]]$resEpi$low_R[f,k+1]
   n_est <- length(x)
   
   # if(Change == 0){
@@ -278,14 +265,14 @@ niceplot <- function(i,res_summary, res_base,inputs){
                                   # TeX('R_t within range of observed mobility'),
                                   TeX('R_t^{obs}'),
                                   TeX('R_t^{obs} associated with new Th')),
-            col = c(rgb(.1,.1,.1),'black','red4'),lwd=2,bty='n',cex=1.5)
+            col = c(rgb(.1,.1,.1),'black','red4'),lwd=2,bty='n')
    }else{
      legend('topright',legend = c(TeX('older R_t predicted (with mobility)'),
                                   TeX('recent R_t predicted (with mobility)'),
                                   # TeX('R_t within range of observed mobility'),
                                   TeX('R_t^{obs}'),
                                   TeX('R_t^{obs} associated with new Th')),
-            col = c(rgb(.4,.5,.1),rgb(.8,.3,0),'black','red4'),lwd=2,bty='n',cex=1.5)
+            col = c(rgb(.4,.5,.1),rgb(.8,.3,0),'black','red4'),lwd=2,bty='n')
      
    }
    

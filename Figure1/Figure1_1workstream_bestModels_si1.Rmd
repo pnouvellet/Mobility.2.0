@@ -1,0 +1,108 @@
+---
+title: "input"
+author: "Pierre Nouvellet"
+date: "2019-07"
+---
+
+```{r options, include = FALSE, message = FALSE, warning = FALSE, error = FALSE}
+library(knitr)
+library(Hmisc)
+library(EpiEstim)
+library(zoo)
+library(latex2exp)
+
+opts_chunk$set(collapse = TRUE)
+
+opts_chunk$set(fig.path='figs/', fig.keep='high', 
+               dev=c('png'), fig.width=9, fig.height=6, cache=FALSE,
+               tidy=FALSE, warning=FALSE, fig.show="asis"
+)
+
+
+```
+
+# input data
+
+```{r}
+# source(file = '../inputProcessing/date_input.r')
+source(file = 'Rscript/niceplot_bestmodel_si1.R')
+
+
+
+```
+
+## make figure1
+
+
+
+```{r}
+
+inputs<- readRDS(file=
+                   '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/inputProcessing/Rdata/inputs.rds')
+names(inputs)
+data_stream <- names(inputs$M_process_mat )
+# for(i in 1:length(data_stream)){
+#   dir.create(path = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/figs/',data_stream[i]))
+# }
+
+
+res_base <- readRDS(file = 
+                      paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/EpiEstim/Rdata/output_EpiE.rds' ))
+
+
+AG0 <- readRDS('../TableModels_comparision/AG.rds')
+
+si <- 1
+for (Mdata in data_stream[12]){
+  # Mdata = data_stream[12]
+  fd.name=paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/figure1/fig_BestModels/si1',Mdata)
+  dir.create(fd.name)
+  
+  
+  
+  res_m <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/si1/output_over_form_',Mdata,'.rds' ))[[si]]
+  res_summary <- readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_Over/si1/output2_over_form_',Mdata,'.rds' ) )[[si]]
+  
+  res_m2 <-  readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/si1/output_over_form_',Mdata,'.rds' ))[[si]]
+  res_summary2 <- readRDS( file = paste0('../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/FitModels/R0_beta_tD_Over/si1/output2_over_form_',Mdata,'.rds' ) )[[si]]
+  
+  
+  n_country <- length(res_m$country)
+  country <- res_m$country
+  
+  country_initial <- names(inputs$D)[-1]
+  corr_across <- list(Robs =  res_base[[2]]$resEpi$median_R,
+                      Rpred = res_summary2$results_full_Rt_D2$median_R,
+                      Tc = res_summary2$results_full_Rt_D2$median_R)
+  corr_across$Tc[,2:(length(country)+1)] <- 1
+  
+  
+  for (i in 1:n_country){
+     mu_id = 18.8
+    k <- which(country_initial %in% country[i])
+    
+    Change <- AG0$Tc[i]  #as.numeric(round(res_m$resMCMC$DIC[i]) - round(res_m2$resMCMC$DIC[i]) > 10)
+    
+    niceplot(i, res_summary, res_base, inputs)
+    
+    # f <- 1:nrow(res_base[[si]]$resEpi$S_below.5) #
+    # f <- f[which(res_base$resEpi$CV_below.2[,i+1])]
+    corr_across[[1]][,i+1] <- res_base[[2]]$resEpi$median_R[,i+1]
+    # f <- which(res_summary$results_full_Rt_D2$median_R[,i+1] != 0)
+    if (Change==0){
+      
+      corr_across[[2]][,i+1] <- res_summary$results_full_Rt_D2$median_R[,i+1]
+    }else{  
+      # second predictions
+      corr_across[[2]][,i+1] <- res_summary2$results_full_Rt_D2$median_R[,i+1]
+      mtc <- median(res_m2$resMCMC$theta[,4*length(country)+i]) + mu_id 
+      corr_across[[3]][round(mtc):nrow(corr_across[[2]]),i+1] <- 2
+      
+    }
+    # plot(x,x2)
+    
+  }
+  saveRDS(corr_across,file = paste0(Mdata,'_corr_si1.rds'))
+}
+
+```

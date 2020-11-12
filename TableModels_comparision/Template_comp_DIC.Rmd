@@ -532,9 +532,9 @@ c(tail(res_m2b$results_full_Rt_D2$median_R$United_Kingdom,1),
 
 # categories
 
-```{r,freq,fig.height=4,fig.width=6}
+```{r,freq,fig.height=4,fig.width=7}
 # par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
-par(mar = c(5,4,2,0))
+par(mar = c(5,4,2,0),cex=1.2,cex.lab=1.2)
 
 count1 <- table(AG$region2,AG$beta1,AG$Tc)
 # count1
@@ -562,7 +562,7 @@ legend('topright',legend = c('Rt decreases with mobility reduction',
                             'Rt increases with mobility reduction',
                             'no significant relationship'),
        lwd = 4,col = c('darkolivegreen','brown','grey'),
-       seg.len = 0.5,cex=.8,bty = 'n')
+       seg.len = 0.5,cex=.9,bty = 'n')
 
 
 #####
@@ -688,5 +688,6 @@ for (i in 1:nrow(AG)){
 }
 
 write.csv(Tab_SI,file = 'table_SI.csv')
+saveRDS(AG,file = 'AG.rds')
 
 ```
