@@ -73,6 +73,11 @@ write.csv(DICs1,file = 'DICs1.csv')
 write.csv(DICs2,file = 'DICs2.csv')
 write.csv(DICs3,file = 'DICs3.csv')
 write.csv(DICs4,file = 'DICs4.csv')
+
+res_m1$over[,1]
+
+res_m2$over[,1]
+
 ```
 
 
@@ -483,32 +488,32 @@ for (i in 1:length(idx)){
   
   if(AG$Tc[idx[i]]){
     yl[i] = paste0(gsub('_',' ',AG$country[idx[i]]),' (',
-                   round(AG$Rsq1[idx[i]],digits = 2),' ; ',
-                   round(AG$Rsq2[idx[i]],digits = 2),')')
+                   round(100*AG$Rsq1[idx[i]],digits = 0),' ; ',
+                   round(100*AG$Rsq2[idx[i]],digits = 0),')')
     
     if(AG$beta1[i]==1){
       x <- c(AG$th1[idx[i]], AG$th1low[idx[i]],AG$th1up[idx[i]] )
       x <- bound(x)
-      lines( x[1], i+.1,type = 'p', pch=16,col = rgb(.4,.5,.1))
-      lines(x[2:3], c(i,i)+.1,lwd=2,col = rgb(.4,.5,.1))
+      lines( x[1], i+.1,type = 'p', pch=16,col = 'darkslategray4')
+      lines(x[2:3], c(i,i)+.1,lwd=2,col = 'darkslategray4')
     }
     if(AG$beta2[i]==1){
       x <- c(AG$th2[idx[i]], AG$th2low[idx[i]],AG$th2up[idx[i]] )
       x <- bound(x)
-      lines( x[1], i-.1,type = 'p', pch=16,col = rgb(.8,.3,0))
-      lines(x[2:3], c(i,i)-.1,lwd=2,col = rgb(.8,.3,0))
+      lines( x[1], i-.1,type = 'p', pch=16,col = 'darkorange1')
+      lines(x[2:3], c(i,i)-.1,lwd=2,col = 'darkorange1')
     }
     
     
   }else{
     yl[i] = paste0(gsub('_',' ',AG$country[idx[i]]),' (',
-                   round(AG$Rsq[idx[i]],digits = 2),')')
+                   round(100*AG$Rsq[idx[i]],digits = 0),')')
     
     if(AG$beta1[i]==1){
       x <- c(AG$th1[idx[i]] , AG$th1low[idx[i]],AG$th1up[idx[i]])
       x <- bound(x)
-      lines( x[1], i,type = 'p', pch=16,col = rgb(.4,.5,.1))
-      lines(x[2:3], c(i,i),lwd=2,col = rgb(.4,.5,.1))
+      lines( x[1], i,type = 'p', pch=16,col = 'darkslategray4')
+      lines(x[2:3], c(i,i),lwd=2,col = 'darkslategray4')
     }
     
   }
@@ -526,7 +531,42 @@ c(tail(res_m2b$results_full_Rt_D2$median_R$United_Kingdom,1),
   tail(res_m2b$results_full_Rt_D2$up_R$United_Kingdom,1))
 
 
+mob_now <- data.frame(country = AG$country,
+                      upper = NA,lower = NA,
+                      current = (100-inputs$M_process_mat$AG)[nrow(inputs$M_process_mat$AG),],
+                      above = NA)
 
+for(i in 1:nrow(AG)){
+  if(AG$Tc[i]==1){
+    if(AG$beta2[i]==1){
+    mob_now$upper[i] <- 100*AG$th2up[i]
+    mob_now$lower[i] <- 100*AG$th2low[i]
+    }
+  }else{
+    if(AG$beta1[i]==1){
+    mob_now$upper[i] <- 100*AG$th1up[i]
+    mob_now$lower[i] <- 100*AG$th1low[i]
+    }
+  }
+  # if((mob_now$current[i] < mob_now$upper[i]) & (mob_now$current[i] > mob_now$upper[i])){
+  #   mob_now$above[i] <- 'uncertain'
+  # }else if((mob_now$current[i] > mob_now$upper[i])){
+  #   mob_now$above[i] <- 'control'
+  # }else{
+  #   mob_now$above[i] <- 'grow'
+  # }
+  # 
+  
+  
+}
+mob_now2 <- mob_now[which(!is.na(mob_now$upper) |!is.na(mob_now$lower) ),]
+mob_now2$above <- 'uncertain'
+mob_now2$above[which(mob_now2$current < mob_now2$lower)] <- 'grow'
+mob_now2$above[which(mob_now2$current > mob_now2$upper)] <- 'control'
+
+mob_now2$country[mob_now2$above == 'control']
+mob_now2$country[mob_now2$above == 'grow']
+mob_now2$country[mob_now2$above == 'uncertain']
 ```
 
 
@@ -575,11 +615,11 @@ print('overall')
 
 # sum(AG$Tc==1)/nrow(AG)
 
-quantile(c(AG$Rsq1[AG$Tc==0],AG$Rsq1,AG$Rsq2),c(.5,.025,.975),na.rm=TRUE)
-quantile(c(AG$Rsq1[AG$Tc==1]),c(.5,.025,.975),na.rm=TRUE)
-quantile(c(AG$Rsq2[AG$Tc==1]),c(.5,.025,.975),na.rm=TRUE)
+quantile(c(AG$Rsq1[AG$Tc==0],AG$Rsq1,AG$Rsq2),c(.5,.25,.75),na.rm=TRUE)
+quantile(c(AG$Rsq1[AG$Tc==1]),c(.5,.25,.75),na.rm=TRUE)
+quantile(c(AG$Rsq2[AG$Tc==1]),c(.5,.25,.75),na.rm=TRUE)
 
-quantile(c(AG$Rsq1[AG$Tc==1 & AG$TotalDeath>5e3]),c(.5,.025,.975),na.rm=TRUE)
+quantile(c(AG$Rsq1[AG$Tc==1 & AG$TotalDeath>5e3]),c(.5,.25,.75),na.rm=TRUE)
 
 # quantile(AG$Rsq[which(AG$TotalDeath>5e3)],c(.5,.025,.975))
 # quantile(AG$Rsq1,c(.5,.025,.975),na.rm=TRUE)
@@ -592,16 +632,16 @@ quantile(c(AG$Rsq1[AG$Tc==1 & AG$TotalDeath>5e3]),c(.5,.025,.975),na.rm=TRUE)
 
 #################
 
-quantile(AG$Rsq1[which(AG$beta1==1)],c(.5,.025,.975))
+quantile(AG$Rsq1[which(AG$beta1==1)],c(.5,.25,.75))
 
 sum(AG$beta1==1)/nrow(AG)
-quantile(AG$Rsq1[which(AG$beta1==1)],c(.5,.025,.975))
-quantile(AG$Rsq1[which(AG$beta1==1 & AG$TotalDeath>5e3)],c(.5,.025,.975))
+quantile(AG$Rsq1[which(AG$beta1==1)],c(.5,.25,.75))
+quantile(AG$Rsq1[which(AG$beta1==1 & AG$TotalDeath>5e3)],c(.5,.25,.75))
 
 ##########################
 sum(AG$beta2==1,na.rm=TRUE)/sum(!is.na(AG$beta2))
-quantile(AG$Rsq2[which(AG$beta2==1)],c(.5,.025,.975))
-quantile(AG$Rsq2[which(AG$beta2==1 & AG$TotalDeath>5e3)],c(.5,.025,.975))
+quantile(AG$Rsq2[which(AG$beta2==1)],c(.5,.25,.75))
+quantile(AG$Rsq2[which(AG$beta2==1 & AG$TotalDeath>5e3)],c(.5,.25,.75))
 
 ```
 

@@ -36,7 +36,7 @@ niceplot <- function(i,res_summary, res_base,inputs){
        ylim = c(0,5),
        type = 'l',col='black',lwd=2,bty = 'n',
        # main =country[i], 
-       xlab = '',ylab = TeX('R_t'))
+       xlab = '',ylab = TeX('R'))
   mtext('b)', side = 3, line = 1.5, adj = -.15, cex = 1)
   
   
@@ -105,12 +105,17 @@ niceplot <- function(i,res_summary, res_base,inputs){
     lines(inputs$D$dates[round(t_change[2:3])],rep(5,2),lwd=1.5,col='darkorange')
   }
   if (Change ==0){
-    legend('topright',legend = c(TeX('R_t^{D}'),TeX('R_t'),TeX('R_t^{obs}')),
-           col = c(rgb(0,0,1),rgb(1,0,0),rgb(0,0,0)),lwd=2,bty='n',seg.len = .5,cex=1.5)
+    legend('topright',legend = c(TeX('R_t (at infection)'),
+                                 TeX('R_t^{D} (at death)'),
+                                 TeX('R_t^{D,EpiEstim} (at death)')),
+           col = c(rgb(1,0,0),rgb(0,0,1),rgb(0,0,0)),lwd=2,bty='n',seg.len = .5,cex = 1.2)
   }else{
-    legend('topright',legend = c(TeX('R_t^{D}'),TeX('R_t'),TeX('R_t^{obs}'),TeX('t_{change}')),
-           col = c(rgb(0,0,1),rgb(1,0,0),rgb(0,0,0),'darkorange'),lwd=2,
-           pch = c(rep(NA,3),16),bty='n',seg.len = .5,cex=1.5)
+    legend('topright',legend = c(TeX('R_t (at infection)'),
+                                 TeX('R_t^{D} (at death)'),
+                                 TeX('R_t^{D,EpiEstim} (at death)'),
+                                 TeX('t_{change}')),
+           col = c(rgb(1,0,0),rgb(0,0,1),rgb(0,0,0),'darkorange'),lwd=2,
+           pch = c(rep(NA,3),16),bty='n',seg.len = .5,cex = 1.2)
   }
   
   
@@ -174,7 +179,7 @@ niceplot <- function(i,res_summary, res_base,inputs){
          res_summary2$results_full_Rt_assumed_mob$median_R[ ,i+1],
          type='l',#ylim = c(0,10),
          # xlim=c(0,N_days),
-         col=rgb(.4,.5,.1),lwd=2, 
+         col='darkslategray4',lwd=2, 
          xlab = 'Prop. reduction in movement',
          ylab = TeX('R_t'),yaxt="n",
          xlim = c(min(c(x,0)),1),bty = 'n',
@@ -189,13 +194,13 @@ niceplot <- function(i,res_summary, res_base,inputs){
               rev(res_summary2$results_full_Rt_assumed_mob$median_R$mobility)),
             (c(res_summary2$results_full_Rt_assumed_mob$low_R[,i+1],
                rev(res_summary2$results_full_Rt_assumed_mob$up_R[,i+1]))),
-            col=rgb(.4,.5,.1,.2),border=NA)
+            col=rgb(.4,.5,.4,.2),border=NA)
     
     lines(res_summary2$results_full_Rt_assumed_mob2$median_R$mobility,
           res_summary2$results_full_Rt_assumed_mob2$median_R[ ,i+1],
           type='l',#ylim = c(0,10),
           # xlim=c(0,N_days),
-          col=rgb(.8,.3,0),lwd=2, 
+          col='darkorange1',lwd=2, 
           xlab = 'Prop. reduction in movement',
           ylab = TeX('R_t'),yaxt="n",
           xlim = c(0,1),bty = 'n',
@@ -266,8 +271,8 @@ niceplot <- function(i,res_summary, res_base,inputs){
            y = y,
            yplus = yplus,
            yminus = yminus,
-           col = c(rep(rgb(0,0,0),n_est-f_new),rep('red4',f_new)),
-           errbar.col = c(rep(rgb(0,0,0),n_est-f_new),rep('red4',f_new)),
+           col = c(rep('darkslategrey',n_est-f_new),rep('darkorange3',f_new)),
+           errbar.col = c(rep('darkslategrey',n_est-f_new),rep('darkorange3',f_new)),
            add = TRUE)
    
    if (Change==0){
@@ -276,16 +281,17 @@ niceplot <- function(i,res_summary, res_base,inputs){
                                   # TeX('past R_t predicted (with mobility)'),
                                   # TeX('new R_t predicted (with mobility)'),
                                   # TeX('R_t within range of observed mobility'),
-                                  TeX('R_t^{obs}'),
-                                  TeX('R_t^{obs} associated with new Th')),
-            col = c(rgb(.1,.1,.1),'black','red4'),lwd=2,bty='n',cex=1.5)
+                                  TeX('R_t^{D,EpiEstim}')),
+            col = c(rgb(.1,.1,.1),'black'),pch = c(NA,16),lwd=2,bty='n',cex = 1.5)
    }else{
-     legend('topright',legend = c(TeX('older R_t predicted (with mobility)'),
-                                  TeX('recent R_t predicted (with mobility)'),
+     legend('topright',legend = c(TeX('pre-change R_t predicted (with mobility)'),
+                                  TeX('post-change R_t predicted (with mobility)'),
                                   # TeX('R_t within range of observed mobility'),
-                                  TeX('R_t^{obs}'),
-                                  TeX('R_t^{obs} associated with new Th')),
-            col = c(rgb(.4,.5,.1),rgb(.8,.3,0),'black','red4'),lwd=2,bty='n',cex=1.5)
+                                  TeX('pre-change R_t^{D,EpiEstim}'),
+                                  TeX('post-change R_t^{D,EpiEstim}')),
+            col = c('darkslategray4','darkorange1','darkslategrey','darkorange3'),
+            pch = c(NA,NA,16,16),
+            lwd=2,bty='n',cex = 1.5)
      
    }
    

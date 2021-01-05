@@ -33,7 +33,8 @@ data_stream <- names(inputs$M_process_mat )
 
 M <-(inputs$M_process_mat$AG)
 
-M_sum <- apply(M,1,quantile,c(0.5,.025,.975),na.rm=TRUE)
+M_sum0 <- apply(M,1,quantile,c(0.5,.025,.975),na.rm=TRUE)
+M_sum <- apply(M,1,quantile,c(0.5,.25,.75),na.rm=TRUE)
 x <- inputs$M$apple$driving$dates
 x <- as.Date(x,format = '%Y-%m-%d')
 ```
@@ -44,7 +45,7 @@ plot(x,M_sum[1,]/100,type = 'l',bty='n',
      ylim = c(0,150)/100,xlim = xlim,xlab = '',ylab = 'prop. mobility')
 polygon(c(x,rev(x)),c(M_sum[2,],rev(M_sum[3,]))/100,border = NA,col = rgb(.1,.1,.1,.2))
 
-legend('topleft',legend = c('median','95 percentile across countries'),
+legend('topleft',legend = c('median','IQR across countries'),
        lwd = c(2,5),col = c(rgb(.1,.1,.1),rgb(.1,.1,.1,.2)),bty='n',cex=.8)
 
 f <- which(M_sum[1,] %in% min(M_sum[1,],na.rm=TRUE))
