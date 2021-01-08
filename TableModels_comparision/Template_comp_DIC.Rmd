@@ -454,6 +454,10 @@ for(i in 1:nrow(AG)){
 
 
 ```{r,Thresholds,fig.height=10,fig.width=8}
+
+pdf(file = '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/TableModels_comparision/figure4.pdf',
+    width = 8, height=10)
+
 bound <- function(x){
   if(is.numeric(x[1])){
     if(is.na(x[2])) x[2] <- -2
@@ -567,12 +571,18 @@ mob_now2$above[which(mob_now2$current > mob_now2$upper)] <- 'control'
 mob_now2$country[mob_now2$above == 'control']
 mob_now2$country[mob_now2$above == 'grow']
 mob_now2$country[mob_now2$above == 'uncertain']
+
+mtext(side = 3, text = 'Country ( R-sq(s) )',adj = -.4,padj = 2.5,cex=1, font =3)
 ```
 
 
 # categories
 
 ```{r,freq,fig.height=4,fig.width=7}
+
+pdf(file = '../../../../Dropbox (SPH Imperial College)/Mobility.2.0.Save/Saved_file/TableModels_comparision/figure3.pdf',
+    width = 7, height=4)
+
 # par(mar = c(bottom, left, top, right)), default  c(5.1, 4.1, 4.1, 2.1).
 par(mar = c(5,4,2,0),cex=1.2,cex.lab=1.2)
 
